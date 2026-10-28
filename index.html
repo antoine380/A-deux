@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#4E2E7A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="À Deux">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+/* version autonome : pas de synchro Claude, le code d'échange la remplace */
+#syncBtn,#syncNote{display:none!important}
+html{-webkit-text-size-adjust:100%}body{overscroll-behavior-y:none}</style>
+<title>À Deux</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone app shell — sticky top bar, scrolling views, fixed 5-tab bar; sub-pages slide in inside "Apprendre" */
+:root{
+  --bg:#F5EEF3; --surface:#FFFFFF; --raise:#FBF7FA; --fg:#24161F; --muted:#7A6573; --line:#E7D9E2;
+  --accent:#A8215F; --accent-2:#D9487F; --accent-soft:#F7DCE8;
+  --plum:#4E2E7A; --plum-2:#7B5BB0; --plum-soft:#E9E1F5;
+  --gold:#B07A2A; --gold-soft:#F4E7D0;
+  --ok:#2C7A57; --ok-soft:#DBF0E4; --mid:#9A6512; --mid-soft:#F6EAD1; --no:#A83636; --no-soft:#F6DEDE;
+  --tissue-1:#F3B8C9; --tissue-2:#D9628A; --bulb-1:#D6C2EE; --bulb-2:#8E6CC4; --bone:#EADFD2; --bone-line:#BFAE98;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#140D13; --surface:#1F151D; --raise:#271B25; --fg:#F4E9F0; --muted:#B49FAD; --line:#3A2A36;
+  --accent:#F27DAE; --accent-2:#FF9EC2; --accent-soft:#45202F;
+  --plum:#C3A9EE; --plum-2:#9D80D6; --plum-soft:#2D2242;
+  --gold:#E2B46A; --gold-soft:#3A2C18;
+  --ok:#7DD3A5; --ok-soft:#1C372A; --mid:#E8BC66; --mid-soft:#3B2E15; --no:#F08E8E; --no-soft:#422121;
+  --tissue-1:#B65477; --tissue-2:#F27DAE; --bulb-1:#5B4485; --bulb-2:#B79BEA; --bone:#3A2F28; --bone-line:#7E6C58;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#140D13; --surface:#1F151D; --raise:#271B25; --fg:#F4E9F0; --muted:#B49FAD; --line:#3A2A36;
+  --accent:#F27DAE; --accent-2:#FF9EC2; --accent-soft:#45202F;
+  --plum:#C3A9EE; --plum-2:#9D80D6; --plum-soft:#2D2242;
+  --gold:#E2B46A; --gold-soft:#3A2C18;
+  --ok:#7DD3A5; --ok-soft:#1C372A; --mid:#E8BC66; --mid-soft:#3B2E15; --no:#F08E8E; --no-soft:#422121;
+  --tissue-1:#B65477; --tissue-2:#F27DAE; --bulb-1:#5B4485; --bulb-2:#B79BEA; --bone:#3A2F28; --bone-line:#7E6C58;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main.wrap{padding-block:4px calc(104px + env(safe-area-inset-bottom,0px))}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
+.brand{font-family:var(--display);font-weight:800;font-size:1.3rem;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.brand i{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--accent-2),var(--accent) 60%,var(--plum));display:inline-block}
+.back{all:unset;cursor:pointer;display:flex;align-items:center;gap:4px;color:var(--accent);font-weight:600;font-size:.95rem}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.pill{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);padding:4px 9px;border-radius:999px}
+h1{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1.05;letter-spacing:-.025em;margin:22px 0 8px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:1.22rem;letter-spacing:-.01em;margin:30px 0 10px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:600;font-size:1.05rem;margin:0 0 4px}
+p{margin:0 0 12px}
+.lead{color:var(--muted);font-size:1.02rem;max-width:62ch}
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:10px;align-items:center}
+.btn{all:unset;cursor:pointer;display:inline-flex;justify-content:center;align-items:center;gap:6px;font-weight:700;font-size:.92rem;padding:11px 16px;border-radius:14px;background:var(--accent);color:var(--surface);text-align:center}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.btn.soft{background:var(--accent-soft);color:var(--accent)}
+.btn:focus-visible,.chip:focus-visible,.tile:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.chip{all:unset;cursor:pointer;font-size:.86rem;font-weight:600;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.callout{background:var(--plum-soft);border-radius:16px;padding:14px 16px;font-size:.95rem}
+.callout b{color:var(--plum)}
+[hidden]{display:none!important}
+
+/* HOME */
+.hero{margin-top:14px;border-radius:24px;padding:22px 20px;background:
+  radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--accent-2) 40%,transparent),transparent 60%),
+  radial-gradient(90% 90% at 0% 100%,color-mix(in srgb,var(--plum-2) 45%,transparent),transparent 60%),
+  var(--plum);color:#fff;position:relative;overflow:hidden}
+.hero .eyebrow{color:#FFD6E7}
+.hero h1{color:#fff;margin:8px 0 6px;font-size:1.75rem}
+.hero p{color:#F1E4F7;margin:0 0 14px}
+.hero .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden;margin:6px 0 8px}
+.hero .bar span{display:block;height:100%;background:linear-gradient(90deg,#FFB3D1,#fff);border-radius:99px;transition:width .5s}
+.hero .meta{display:flex;justify-content:space-between;font-size:.82rem;color:#F1E4F7;font-variant-numeric:tabular-nums}
+.hero .btn{background:#fff;color:var(--plum);margin-top:14px}
+.qday{display:flex;flex-direction:column;gap:8px}
+.qday blockquote{margin:0;font-family:var(--display);font-size:1.22rem;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:6px;min-height:118px;position:relative;overflow:hidden}
+.tile svg.ic{width:34px;height:34px}
+.tile strong{font-family:var(--display);font-weight:600;font-size:1.02rem}
+.tile small{color:var(--muted);font-size:.84rem;line-height:1.35}
+
+/* PROGRAM */
+.lesson{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.lesson:last-child{border-bottom:0}
+.lesson .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-family:var(--display);background:var(--raise);border:1.5px solid var(--line);font-variant-numeric:tabular-nums}
+.lesson.done .n{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.lesson b{display:block;font-size:.98rem}
+.lesson span{font-size:.85rem;color:var(--muted)}
+.lesson .go{color:var(--muted)}
+.lesson:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px}
+.sheet ol{padding-left:20px;margin:8px 0 14px}
+.sheet li{margin-bottom:6px}
+
+/* ANATOMY PLATE */
+.plate{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:10px 6px 4px;position:relative}
+.plate svg{display:block;width:100%;height:auto}
+.plate .cap{display:flex;justify-content:space-between;padding:4px 12px 8px;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bone{fill:var(--bone);stroke:var(--bone-line);stroke-width:1.2}
+.tissue{fill:url(#gTissue);stroke:var(--tissue-2);stroke-width:1.4}
+.glans{fill:url(#gGlans);stroke:var(--accent);stroke-width:1.4}
+.bulb{fill:url(#gBulb);stroke:var(--plum-2);stroke-width:1.4}
+.hood{fill:none;stroke:var(--fg);stroke-width:2.4;stroke-linecap:round;opacity:.75}
+.orifice{fill:var(--raise);stroke:var(--muted);stroke-width:1.2;stroke-dasharray:3 3}
+.nerve{fill:none;stroke:var(--gold);stroke-width:.9;opacity:.65}
+.lbl{font-family:var(--body);font-size:10.5px;fill:var(--muted);font-weight:600}
+.lead-line{stroke:var(--muted);stroke-width:.8;fill:none}
+.hl{fill:none;stroke:var(--fg);stroke-width:.8;opacity:.25}
+.part{cursor:pointer;transition:opacity .25s}
+.plate.sel .part{opacity:.28}
+.plate.sel .part.on{opacity:1}
+.part:focus{outline:none}
+.part:focus-visible *{stroke-width:2.6}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.fact b{display:block;font-family:var(--display);font-size:1.35rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.1}
+.fact span{font-size:.78rem;color:var(--muted);line-height:1.3;display:block;margin-top:4px}
+
+/* BODY MAP */
+.bodymap svg{display:block;width:100%;max-width:300px;margin:0 auto;height:auto}
+.sil{fill:var(--raise);stroke:var(--line);stroke-width:1.5}
+.zone{cursor:pointer}
+.zone circle.halo{fill:var(--accent);opacity:.18;transition:opacity .2s}
+.zone circle.core{fill:var(--accent)}
+.zone.on circle.halo{opacity:.45}
+.zone:focus{outline:none}
+.zone:focus-visible circle.core{stroke:var(--fg);stroke-width:2}
+@media (prefers-reduced-motion:no-preference){.zone circle.halo{animation:pulse 2.6s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.32}}
+.legend{display:flex;gap:14px;font-size:.8rem;color:var(--muted);justify-content:center;margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+
+/* LEARN steps & moves */
+.steps .step{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps .step:last-child{border-bottom:0}
+.dot{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center;font-size:.85rem;font-variant-numeric:tabular-nums}
+.step b{display:block}
+.step p{margin:2px 0 0;color:var(--muted);font-size:.94rem}
+.moves{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.move{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.move svg{width:100%;height:70px}
+.move b{font-size:.95rem}
+.move span{font-size:.84rem;color:var(--muted);line-height:1.35}
+.mv-path{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mv-target{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
+@media (prefers-reduced-motion:no-preference){.mv-path.anim{stroke-dasharray:200;stroke-dashoffset:200;animation:draw 2.4s ease-in-out infinite}}
+@keyframes draw{40%,70%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px}
+.chart svg{display:block;width:100%;height:auto}
+.ax{stroke:var(--line);stroke-width:1}
+.t{font-family:var(--body);font-size:10px;fill:var(--muted)}
+
+/* POSITIONS */
+.pos{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.pos-head{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center}
+.glyph{width:64px;height:64px;border-radius:16px;background:var(--raise);display:grid;place-items:center}
+.glyph svg{width:46px;height:46px}
+.g-a{fill:var(--accent)}
+.g-b{fill:var(--plum-2)}
+.g-l{stroke:var(--muted);stroke-width:1.5;fill:none;stroke-dasharray:2 3}
+.pos-head h3{margin:0}
+.pos-head small{color:var(--muted);font-size:.82rem}
+.fav{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:12px}
+.fav svg{width:22px;height:22px;fill:none;stroke:var(--muted);stroke-width:1.8}
+.fav[aria-pressed="true"] svg{fill:var(--accent);stroke:var(--accent)}
+.fav:focus-visible{outline:2px solid var(--accent)}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.meter{display:flex;flex-direction:column;gap:4px}
+.meter span{font-size:.76rem;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.meter .seg5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.meter .seg5 i{height:6px;border-radius:3px;background:var(--line)}
+.meter .seg5 i.f{background:var(--accent)}
+.meter.p .seg5 i.f{background:var(--plum-2)}
+.pos p{margin:0;font-size:.94rem}
+.pos .tip{font-size:.88rem;background:var(--raise);border-radius:12px;padding:10px 12px}
+.pos .tip b{color:var(--accent)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--plum-soft);color:var(--plum)}
+
+/* TOGETHER */
+.who{display:grid;grid-template-columns:repeat(3,1fr);background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.who button{all:unset;cursor:pointer;text-align:center;font-weight:700;font-size:.88rem;padding:9px 4px;border-radius:10px;color:var(--muted)}
+.who button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.who button:focus-visible{outline:2px solid var(--accent)}
+.deck{position:relative;min-height:250px;margin-top:12px}
+.dcard{border-radius:24px;padding:22px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(150deg,var(--plum),var(--accent));transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.dcard.lv1{background:linear-gradient(150deg,#6E4FA8,#C04A84)}
+.dcard.lv2{background:linear-gradient(150deg,#4E2E7A,#A8215F)}
+.dcard.lv3{background:linear-gradient(150deg,#2B1A47,#7E1846)}
+.dcard .lvl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.85}
+.dcard .txt{font-family:var(--display);font-size:1.45rem;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.dcard .cnt{font-size:.8rem;opacity:.8;font-variant-numeric:tabular-nums}
+.dcard.out-l{transform:translateX(-110%) rotate(-8deg);opacity:0}
+.dcard.out-r{transform:translateX(110%) rotate(8deg);opacity:0}
+.dcard.out-u{transform:translateY(-40px) scale(.95);opacity:0}
+.vote{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.vote button{all:unset;cursor:pointer;text-align:center;padding:12px 6px;border-radius:14px;font-weight:700;font-size:.9rem}
+.vote .n{background:var(--no-soft);color:var(--no)}
+.vote .m{background:var(--mid-soft);color:var(--mid)}
+.vote .y{background:var(--ok-soft);color:var(--ok)}
+.vote button:focus-visible{outline:2px solid var(--fg)}
+.match{display:flex;flex-direction:column;gap:8px}
+.match .mi{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:var(--raise)}
+.match .mi i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:7px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat div{background:var(--raise);border-radius:14px;padding:10px 4px}
+.stat b{display:block;font-family:var(--display);font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:.76rem;color:var(--muted)}
+.rate{display:flex;gap:6px}
+.rate button{all:unset;cursor:pointer;flex:1;text-align:center;padding:9px 0;border-radius:10px;background:var(--raise);border:1px solid var(--line);font-weight:700;font-variant-numeric:tabular-nums}
+.rate button[aria-pressed="true"]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.rate button:focus-visible{outline:2px solid var(--fg)}
+label.f{display:block;font-size:.84rem;font-weight:600;color:var(--muted);margin:12px 0 6px}
+textarea,input[type=text]{width:100%;font:inherit;font-size:16px;color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
+.entry{padding:12px 0;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:0}
+.entry .d{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.spark svg{width:100%;height:70px;display:block}
+
+/* GAME */
+.mode{display:grid;grid-template-columns:1fr 1fr;background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-top:6px}
+.mode button{all:unset;cursor:pointer;text-align:center;font-weight:700;font-size:.9rem;padding:9px 4px;border-radius:10px;color:var(--muted)}
+.mode button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.mode button:focus-visible{outline:2px solid var(--accent)}
+.turn{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px}
+.avatar{display:flex;align-items:center;gap:8px;font-weight:700}
+.avatar i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:.85rem;font-family:var(--display)}
+.av-s{background:var(--accent)}
+.av-a{background:var(--plum-2)}
+.gcard{border-radius:26px;padding:24px 22px;min-height:260px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;color:#fff;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.gcard::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+.gcard.flip{transform:rotateY(90deg)}
+.gcard .top{display:flex;justify-content:space-between;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.9}
+.gcard .txt{font-family:var(--display);font-size:1.5rem;font-weight:600;line-height:1.22;letter-spacing:-.01em;position:relative;z-index:1}
+.gcard .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 6px;border-radius:6px}
+.timer{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.timer .ring{width:46px;height:46px}
+.timer .ring circle{fill:none;stroke-width:4}
+.timer .ring .bg{stroke:rgba(255,255,255,.25)}
+.timer .ring .fg{stroke:#fff;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s linear}
+.timer b{font-family:var(--display);font-size:1.3rem;font-variant-numeric:tabular-nums}
+.timer button{all:unset;cursor:pointer;margin-left:auto;background:rgba(255,255,255,.2);padding:8px 14px;border-radius:12px;font-weight:700;font-size:.88rem}
+.timer button:focus-visible,.dice button:focus-visible{outline:2px solid #fff}
+.gactions{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px}
+.dice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.die{aspect-ratio:1;max-width:100%;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;color:#fff;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.die span{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;font-weight:700}
+.die b{font-family:var(--display);font-size:1.02rem;line-height:1.15;margin-top:4px}
+.die.d1{background:linear-gradient(150deg,var(--accent-2),var(--accent))}
+.die.d2{background:linear-gradient(150deg,var(--plum-2),var(--plum))}
+.die.d3{background:linear-gradient(150deg,#C9963F,#8A5B17)}
+.die.roll{transform:rotate(200deg) scale(.85)}
+.dsentence{font-family:var(--display);font-size:1.25rem;font-weight:600;line-height:1.3;margin:14px 2px 0;text-wrap:balance}
+.rules{font-size:.9rem}
+.rules li{margin-bottom:4px}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.score div{background:var(--raise);border-radius:14px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.score b{font-family:var(--display);font-size:1.3rem;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){.gcard.flip,.die.roll{transform:none}}
+
+.ghub{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.gtile{all:unset;cursor:pointer;border-radius:20px;padding:14px;min-height:122px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;color:#fff;background:linear-gradient(150deg,var(--g1),var(--g2));position:relative;overflow:hidden}
+.gtile::after{content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.1)}
+.gtile span{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.8}
+.gtile b{font-family:var(--display);font-size:1.12rem;font-weight:600;line-height:1.15}
+.gtile small{font-size:.8rem;opacity:.85;line-height:1.3}
+.gtile:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.wheel-wrap{position:relative;max-width:320px;margin:4px auto 0}
+#wheel{display:block;width:100%;height:auto;transition:transform 4.2s cubic-bezier(.15,.85,.2,1);filter:drop-shadow(0 8px 20px rgba(60,20,50,.18))}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--fg);z-index:2}
+.tpo{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.tpo span{text-align:center;font-size:.8rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.tpo button,.qzo button{all:unset;cursor:pointer;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-weight:600;text-align:center;background:var(--raise)}
+.tpo button:focus-visible,.qzo button:focus-visible,.seg2 button:focus-visible{outline:2px solid var(--accent)}
+.qzo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qzo button{padding:12px 8px;font-size:.92rem}
+.qzo button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.qzo button.wrong{background:var(--no-soft);border-color:var(--no);color:var(--no)}
+.pass{text-align:center;padding:18px 4px}
+.pass p{color:var(--ok);font-weight:700;margin-bottom:6px}
+.pass h3{font-size:1.25rem;margin-bottom:14px}
+.reveal{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.reveal div{background:var(--raise);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.reveal b{font-family:var(--display);font-size:1rem;font-weight:600}
+.jmrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0}
+.seg2{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg2 button{all:unset;cursor:pointer;font-size:.84rem;font-weight:700;padding:8px 12px;color:var(--muted)}
+.seg2 button[aria-pressed="true"][data-v="1"]{background:var(--accent-soft);color:var(--accent)}
+.seg2 button[aria-pressed="true"][data-v="0"]{background:var(--plum-soft);color:var(--plum)}
+@media (prefers-reduced-motion:reduce){#wheel{transition:none}}
+
+/* ===== v5 : animations, cartes 3D, dés 3D, pop-up zones ===== */
+.bodymap{position:relative}
+.zpop{position:absolute;z-index:4;background:var(--fg);color:var(--bg);border-radius:16px;padding:12px 34px 12px 14px;box-shadow:0 12px 30px rgba(30,10,30,.28)}
+.zpop h3{color:var(--bg);font-size:1rem;margin:0 0 2px}
+.zpop p{margin:0;font-size:.88rem;line-height:1.4;opacity:.88}
+.zpop::after{content:"";position:absolute;left:calc(var(--ax,50%) - 8px);bottom:-8px;width:16px;height:16px;background:var(--fg);transform:rotate(45deg);border-radius:3px}
+.zpop.below::after{bottom:auto;top:-8px}
+.zx{all:unset;cursor:pointer;position:absolute;top:6px;right:8px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;font-size:1.1rem;opacity:.7}
+.zx:focus-visible{outline:2px solid var(--accent)}
+@media (prefers-reduced-motion:no-preference){.zpop.show{animation:zin .32s cubic-bezier(.2,1.4,.4,1)}}
+@keyframes zin{from{opacity:0;transform:translateY(8px) scale(.92)}}
+
+.gic{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-bottom:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+.gtile{justify-content:flex-start;min-height:140px}
+.gtile .gsc{margin-top:2px;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){
+  .tile,.gtile{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .tiles .tile:nth-child(2),.ghub .gtile:nth-child(2){animation-delay:.05s}
+  .tiles .tile:nth-child(3),.ghub .gtile:nth-child(3){animation-delay:.1s}
+  .tiles .tile:nth-child(4),.ghub .gtile:nth-child(4){animation-delay:.15s}
+  .tiles .tile:nth-child(5),.ghub .gtile:nth-child(5){animation-delay:.2s}
+  .tiles .tile:nth-child(6),.ghub .gtile:nth-child(6){animation-delay:.25s}
+  .tiles .tile:nth-child(7),.ghub .gtile:nth-child(7){animation-delay:.3s}
+  .tiles .tile:nth-child(8),.ghub .gtile:nth-child(8){animation-delay:.35s}
+  .tile,.gtile,.btn,.chip,.lesson{transition:transform .15s ease}
+  .tile:active,.gtile:active,.btn:active,.chip:active{transform:scale(.96)}
+  .hero{animation:heroin .7s cubic-bezier(.2,.8,.2,1) both}
+  .hero::after{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.14),transparent 40%);animation:drift 9s ease-in-out infinite alternate;pointer-events:none}
+  .stack>.card,.steps .step,.pos{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+  .pop{animation:pop .4s cubic-bezier(.2,1.3,.4,1)}
+  .bump{animation:bump .5s cubic-bezier(.2,1.6,.4,1)}
+  .running .ring{animation:breathe 2s ease-in-out infinite}
+}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes heroin{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@keyframes drift{to{transform:translate(12%,10%)}}
+@keyframes pop{from{opacity:.3;transform:scale(.95)}}
+@keyframes bump{40%{transform:scale(1.5);color:var(--accent)}}
+@keyframes breathe{50%{transform:scale(1.08)}}
+.heart{position:fixed;z-index:50;pointer-events:none;color:var(--accent-2);transform:translate(-50%,-50%);animation:heart 1.2s cubic-bezier(.2,.8,.3,1) forwards;text-shadow:0 2px 6px rgba(0,0,0,.15)}
+@keyframes heart{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.1) rotate(20deg)}}
+.plus{position:fixed;z-index:50;pointer-events:none;font-family:var(--display);font-weight:800;color:var(--accent);transform:translate(-50%,0);animation:plus .9s ease-out forwards}
+@keyframes plus{to{opacity:0;transform:translate(-50%,-34px)}}
+
+.pscore{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;margin:4px 0 6px}
+.pscore>div{background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.pscore b{font-family:var(--display);font-size:1.3rem;font-variant-numeric:tabular-nums;display:inline-block}
+.pscore .avatar{font-size:.85rem}
+.pscore .avatar i{width:24px;height:24px;font-size:.72rem}
+@media (max-width:400px){.pscore{grid-template-columns:1fr 1fr}.pscore .chip{grid-column:1/-1;justify-self:end}}
+
+/* table de cartes */
+.table{position:relative;perspective:1200px;min-height:300px;display:grid;place-items:center;padding:8px 0}
+.deckstack{position:absolute;inset:8px 0;display:grid;place-items:center;pointer-events:none}
+.deckstack .cb{position:absolute;width:min(100%,360px);height:280px;border-radius:26px;background:linear-gradient(150deg,var(--plum),var(--accent));opacity:.35}
+.deckstack .cb:nth-child(1){transform:translate(8px,10px) rotate(4deg);opacity:.18}
+.deckstack .cb:nth-child(2){transform:translate(-6px,6px) rotate(-3deg);opacity:.26}
+.deckstack .cb:nth-child(3){transform:translate(2px,3px) rotate(1deg)}
+.fcard{position:relative;width:min(100%,360px);height:280px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.fcard:focus-visible{outline:2px solid var(--fg);outline-offset:4px;border-radius:26px}
+.fcard .inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.2,.4,1)}
+.fcard.open .inner{transform:rotateY(180deg)}
+.fcard.open{cursor:default}
+.face{position:absolute;inset:0;border-radius:26px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.face.back{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;background:
+  repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 2px,transparent 2px 14px),
+  radial-gradient(circle at 30% 20%,#C04A84,transparent 60%),linear-gradient(150deg,#4E2E7A,#7E1846);box-shadow:0 18px 40px rgba(60,20,50,.28);border:1px solid rgba(255,255,255,.18)}
+.face.back::before{content:"";position:absolute;inset:12px;border:1.5px solid rgba(255,255,255,.35);border-radius:18px}
+.mono{font-family:var(--display);font-weight:800;font-size:3.2rem;letter-spacing:-.04em;line-height:1}
+.mono i{font-style:normal;font-weight:400;opacity:.7;margin:0 4px}
+.hint{font-size:.88rem;font-weight:600;opacity:.9;background:rgba(255,255,255,.14);padding:7px 14px;border-radius:99px}
+.face.front{transform:rotateY(180deg);color:#fff;padding:24px 22px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;box-shadow:0 18px 40px rgba(60,20,50,.28)}
+.face.front .top{display:flex;justify-content:space-between;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.9}
+.face.front .txt{font-family:var(--display);font-size:1.42rem;font-weight:600;line-height:1.22;letter-spacing:-.01em}
+.face.front .txt em,.dres .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 6px;border-radius:6px}
+@media (prefers-reduced-motion:no-preference){
+  .fcard.deal{animation:deal .6s cubic-bezier(.2,1.1,.3,1) both}
+  .fcard:not(.open) .face.back{animation:float 3.5s ease-in-out infinite}
+  .fcard.toss{animation:toss .42s cubic-bezier(.5,0,.8,.4) forwards}
+}
+@keyframes deal{from{opacity:0;transform:translate(-30px,-60px) rotate(-14deg) scale(.8)}}
+@keyframes float{50%{transform:translateY(-5px)}}
+@keyframes toss{to{opacity:0;transform:translate(130%,-20px) rotate(18deg)}}
+
+/* dés 3D */
+.dice3d{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;justify-items:center}
+.dscene{width:86px;height:86px;perspective:600px}
+.cube{position:relative;width:86px;height:86px;transform-style:preserve-3d;transition-property:transform;transition-timing-function:cubic-bezier(.15,.9,.25,1)}
+.cf{position:absolute;inset:0;border-radius:18px;display:grid;place-items:center;text-align:center;padding:6px;color:#fff;font-family:var(--display);font-weight:600;font-size:.9rem;line-height:1.1;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28),inset 0 -8px 16px rgba(0,0,0,.18)}
+.c0 .cf{background:linear-gradient(150deg,#E05C95,#A8215F)}
+.c1 .cf{background:linear-gradient(150deg,#9478CC,#4E2E7A)}
+.c2 .cf{background:linear-gradient(150deg,#D6A350,#8A5B17)}
+.f0{transform:rotateY(0deg) translateZ(43px)}
+.f1{transform:rotateY(90deg) translateZ(43px)}
+.f2{transform:rotateY(180deg) translateZ(43px)}
+.f3{transform:rotateY(-90deg) translateZ(43px)}
+.f4{transform:rotateX(90deg) translateZ(43px)}
+.f5{transform:rotateX(-90deg) translateZ(43px)}
+.dlabels{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:14px}
+.dres{min-height:auto;margin-top:16px}
+.btn.whitebtn{background:#fff;color:var(--plum)}
+.btn.ghostw{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* ===== v7 : rituel, soirée, synchro, badges, glisser ===== */
+button,.tile,.gtile,.chip,.btn{touch-action:manipulation}
+.btn,.chip,.gtile,.tile,.vote button,.who button{-webkit-user-select:none;user-select:none}
+.topbar .wrap{gap:8px}
+.topbar .brand,.topbar .back{margin-right:auto}
+.iconbtn{all:unset;cursor:pointer;position:relative;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:var(--fg)}
+.iconbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn:focus-visible{outline:2px solid var(--accent)}
+.sdot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--line);border:2px solid var(--bg)}
+.sdot.on{background:var(--ok)}
+.sdot.ro,.sdot.off{background:var(--mid)}
+.linkbtn{all:unset;cursor:pointer;color:var(--accent);font-weight:700;font-size:.88rem}
+.linkbtn:focus-visible{outline:2px solid var(--accent);border-radius:4px}
+.spk{all:unset;cursor:pointer;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(127,127,127,.14);flex:none;position:relative;z-index:2}
+.spk svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.spk.on{background:var(--accent);color:#fff}
+.face .spk,.gcard .spk{background:rgba(255,255,255,.2);color:#fff}
+.spk:focus-visible{outline:2px solid currentColor}
+@media (prefers-reduced-motion:no-preference){.spk.on svg{animation:breathe 1s ease-in-out infinite}}
+
+/* héros + soirée */
+.hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.hero .btn{margin-top:0}
+.hero .btn.glass{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.soiree-card{all:unset;cursor:pointer;display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;margin-top:12px;padding:14px 16px;border-radius:20px;background:linear-gradient(120deg,#2B1A47,#4E2E7A 55%,#7E1846);color:#fff;position:relative;overflow:hidden;box-sizing:border-box;width:100%}
+.soiree-card .moon{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE6B0,#E2B46A 60%,#B07A2A);box-shadow:0 0 30px rgba(226,180,106,.5)}
+.soiree-card b{font-family:var(--display);font-size:1.15rem;display:block}
+.soiree-card span{font-size:.85rem;opacity:.85}
+.soiree-card:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.soiree-card .moon{animation:glow 4s ease-in-out infinite}.soiree-card::after{content:"";position:absolute;inset:0;background:radial-gradient(2px 2px at 70% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 70%,#fff,transparent),radial-gradient(1.5px 1.5px at 60% 80%,#fff,transparent);opacity:.7;animation:twinkle 3s ease-in-out infinite alternate}}
+@keyframes glow{50%{box-shadow:0 0 44px rgba(226,180,106,.75)}}
+@keyframes twinkle{to{opacity:.25}}
+.tl{display:grid;gap:6px;margin-top:14px}
+.tl div{display:flex;justify-content:space-between;padding:8px 12px;border-radius:12px;background:var(--raise);font-size:.92rem}
+.tl span{color:var(--muted);font-variant-numeric:tabular-nums}
+.sdots{display:flex;gap:6px}
+.sdots i{flex:1;height:5px;border-radius:3px;background:var(--line);transition:background .3s}
+.sdots i.d{background:var(--accent);opacity:.5}
+.sdots i.c{background:var(--accent)}
+.sstep{margin-top:16px}
+.sx{font-size:1.08rem;line-height:1.55}
+.bigt{position:relative;width:180px;height:180px;margin:18px auto 12px}
+.bigt svg{width:100%;height:100%;transform:rotate(-90deg)}
+.bigt circle{fill:none;stroke-width:8}
+.bigt .bg{stroke:var(--line)}
+.bigt .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.bt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bt b{font-family:var(--display);font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums}
+.bt span{font-size:.8rem;color:var(--muted);font-weight:600}
+.snav{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:20px}
+.scards{display:grid;gap:8px;margin-top:12px}
+.scard{border-radius:16px;padding:12px 14px;color:#fff;background:linear-gradient(150deg,#4E2E7A,#A8215F);font-size:.98rem}
+.scard span{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.8;margin-bottom:2px}
+.scard em{font-style:normal;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.scard{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--k)*.12s)}}
+
+/* rituel */
+.rit-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:30px 0 10px}
+.rit-h h2{margin:0}
+.streak{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:.88rem;color:var(--muted);background:var(--raise);border:1px solid var(--line);padding:5px 10px;border-radius:99px;font-variant-numeric:tabular-nums}
+.streak svg{width:16px;height:16px;fill:var(--line);stroke:none}
+.streak.hot{color:var(--gold);background:var(--gold-soft);border-color:transparent}
+.streak.hot svg{fill:var(--gold)}
+@media (prefers-reduced-motion:no-preference){.streak.hot svg{animation:flick 1.6s ease-in-out infinite}}
+@keyframes flick{50%{transform:scale(1.15) rotate(-4deg)}}
+.ritual{display:flex;flex-direction:column;gap:2px}
+.rtop{display:flex;justify-content:space-between;align-items:center}
+.rbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:8px 0 6px}
+.rbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:3px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.rstep{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:start}
+.rchk{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;margin-top:2px;transition:background .2s,border-color .2s,transform .2s}
+.rchk svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s ease .05s}
+.rchk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+.rchk[aria-pressed="true"] svg{stroke-dashoffset:0}
+.rchk:active{transform:scale(.9)}
+.rchk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rstep.ok .rbody>p,.rstep.ok blockquote{opacity:.6}
+.rl{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:3px}
+.rbody blockquote{margin:0 0 4px;font-family:var(--display);font-size:1.12rem;font-weight:600;line-height:1.3}
+.rbody p{margin:0 0 4px}
+.rbody em{font-style:normal;font-weight:700}
+.rdone{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--ok-soft);color:var(--ok);font-size:.92rem}
+
+/* parcours */
+.redo{margin-top:10px}
+
+/* envies : glisser + liste */
+.dcard{position:relative;touch-action:none;cursor:grab}
+.stamp{position:absolute;top:18px;font-family:var(--display);font-weight:800;font-size:1.3rem;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border:3px solid #fff;border-radius:10px;opacity:0;pointer-events:none;background:rgba(0,0,0,.12)}
+.st-oui{right:18px;transform:rotate(12deg)}
+.st-non{left:18px;transform:rotate(-12deg)}
+.st-peut{left:50%;transform:translateX(-50%);top:auto;bottom:18px}
+.who button.locked{opacity:.35}
+.bk{align-items:center}
+.bchk{all:unset;cursor:pointer;flex:none;width:28px;height:28px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;background:var(--surface);transition:background .2s,border-color .2s}
+.bchk svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .3s}
+.bchk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+.bchk[aria-pressed="true"] svg{stroke-dashoffset:0}
+.bchk:focus-visible{outline:2px solid var(--accent)}
+.bk.done>div>div:first-child{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.syncnote{font-size:.84rem;color:var(--ok);background:var(--ok-soft);border-radius:12px;padding:8px 12px;margin-top:10px}
+
+/* feuille synchro */
+.sheet-bg{position:fixed;inset:0;z-index:30;background:rgba(20,8,20,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s}
+.sheet-bg.open{opacity:1}
+.sheet2{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:10px max(18px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-right,0px));transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);max-height:88vh;overflow:auto;box-sizing:border-box}
+.sheet-bg.open .sheet2{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 8px}
+.seg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:4px;margin:8px 0}
+.seg3 button{all:unset;cursor:pointer;text-align:center;font-weight:700;font-size:.84rem;padding:9px 4px;border-radius:10px;color:var(--muted)}
+.seg3 button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.seg3 button:focus-visible{outline:2px solid var(--accent)}
+.steps-sm{padding-left:20px;margin:6px 0;font-size:.92rem}
+.steps-sm li{margin-bottom:6px}
+
+/* questionnaire */
+.onb{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.onb::before{content:"";position:fixed;inset:-20% -20% auto auto;width:70vw;height:70vw;max-width:420px;max-height:420px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent-2) 35%,transparent),transparent 70%);pointer-events:none}
+.onb .wrap{padding-block:28px 40px;position:relative}
+.odots{display:flex;gap:6px;margin-bottom:22px}
+.odots i{flex:1;height:5px;border-radius:3px;background:var(--line);transition:background .3s}
+.odots i.on{background:var(--accent)}
+.oopts{display:flex;flex-direction:column;gap:10px}
+.oopts button{all:unset;cursor:pointer;padding:16px 18px;border-radius:16px;background:var(--surface);border:1.5px solid var(--line);font-weight:600;font-size:1.02rem;transition:transform .15s,border-color .2s,background .2s}
+.oopts button:active{transform:scale(.98)}
+.oopts button.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.oopts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.oopts button{animation:rise .4s cubic-bezier(.2,.8,.2,1) both}.oopts button:nth-child(2){animation-delay:.05s}.oopts button:nth-child(3){animation-delay:.1s}.oopts button:nth-child(4){animation-delay:.15s}.oopts button:nth-child(5){animation-delay:.2s}}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.badge b{font-size:.84rem;line-height:1.2}
+.badge span{font-size:.72rem;color:var(--muted);line-height:1.3}
+.medal svg{width:44px;height:44px}
+.medal .rib{fill:none;stroke:var(--line);stroke-width:4;stroke-linecap:round}
+.medal .disc{fill:var(--raise);stroke:var(--line);stroke-width:2}
+.medal .star{fill:var(--line)}
+.badge.on .rib{stroke:hsl(var(--h),55%,55%)}
+.badge.on .disc,.toast .disc{fill:url(#none);fill:var(--gold);stroke:color-mix(in srgb,var(--gold) 70%,#000)}
+.badge.on .star,.toast .star{fill:#fff}
+.badge:not(.on){opacity:.7}
+@media (prefers-reduced-motion:no-preference){.badge.on .medal{animation:shine 3s ease-in-out infinite}}
+@keyframes shine{50%{transform:rotate(-6deg) scale(1.05)}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:45;transform:translate(-50%,30px);opacity:0;display:flex;align-items:center;gap:12px;background:var(--fg);color:var(--bg);padding:10px 18px 10px 10px;border-radius:18px;box-shadow:0 14px 34px rgba(30,10,30,.3);transition:transform .35s cubic-bezier(.2,1.3,.4,1),opacity .3s;max-width:calc(100vw - 32px);box-sizing:border-box}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast .eyebrow{color:var(--gold)}
+.toast b{font-family:var(--display)}
+.toast .medal svg{width:40px;height:40px}
+@media (max-width:400px){.badges{grid-template-columns:1fr 1fr}}
+
+.chips{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;cursor:grab}
+.chips.more:not(.atend){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent)}
+.chips.more:not(.atstart):not(.atend){-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 44px),transparent)}
+.chips.more.atend:not(.atstart){-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px);mask-image:linear-gradient(90deg,transparent,#000 28px)}
+#xCode{font-family:ui-monospace,Menlo,monospace;font-size:14px;letter-spacing:.02em}
+/* TAB BAR */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 10px;color:var(--muted);text-decoration:none;font-size:.68rem;font-weight:700}
+nav.tabs svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs a[aria-current="page"]{color:var(--accent)}
+nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:10px}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .3s ease}}
+@keyframes in{from{opacity:.4;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <button class="back" id="back" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Apprendre</button>
+    <div class="brand" id="brand"><i></i>À Deux</div>
+    <button class="iconbtn" id="syncBtn" aria-label="Deux téléphones"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="2"/><rect x="13" y="5" width="8" height="14" rx="2"/><path d="M6.5 16h1M16.5 16h1"/></svg><span class="sdot" id="sdot"></span></button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ ACCUEIL ============ -->
+<section class="view" id="v-accueil">
+  <div class="hero">
+    <div class="eyebrow">Stéphanie &amp; Antoine · votre parcours</div>
+    <h1 id="heroT">Découverte</h1>
+    <p id="heroD">Les bases pour mieux se connaître.</p>
+    <div class="bar"><span id="progBar" style="width:0%"></span></div>
+    <div class="meta"><span id="progTxt">0 / 7 étapes</span><span id="progNext">Prochaine : 1</span></div>
+    <div class="hero-actions"><button class="btn" data-go="parcours">Continuer le parcours</button></div>
+  </div>
+  <button class="soiree-card" data-go="soiree"><span class="moon" aria-hidden="true"></span><span><b>Mode Soirée</b><span>Un moment guidé de 30 à 60 minutes</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+
+  <div class="rit-h"><h2>Le rituel du jour</h2><span class="streak" id="streak" title="Jours consécutifs"><svg viewBox="0 0 24 24"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.5 1.5 2 2.5 2C11 8 11 5.5 12 3z"/></svg><b id="stN">0</b> <span id="stL">jour</span></span></div>
+  <div class="card ritual" id="ritual">
+    <div class="rtop"><span class="eyebrow" id="qdayDate">Aujourd'hui</span><span class="small muted" id="rCount">0 / 3</span></div>
+    <div class="rbar"><span id="rbar"></span></div>
+    <div class="rstep" data-r="q"><button class="rchk" data-r="q" aria-label="Question posée" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+      <div class="rbody"><div class="rl">Question à se poser</div><blockquote id="qday"></blockquote><button class="linkbtn" id="qnext">Une autre question</button></div></div>
+    <div class="rstep" data-r="d"><button class="rchk" data-r="d" aria-label="Mini-défi relevé" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+      <div class="rbody"><div class="rl">Mini-défi</div><p id="rDefi"></p></div></div>
+    <div class="rstep" data-r="p"><button class="rchk" data-r="p" aria-label="Position découverte" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+      <div class="rbody"><div class="rl">Position du jour</div><p id="rPos"></p><button class="linkbtn" data-go="positions">Voir la fiche</button></div></div>
+    <div class="rdone" id="rDone" hidden><b>Rituel complété.</b> <span id="rDoneTxt"></span></div>
+  </div>
+
+  <h2>Explorer</h2>
+  <div class="tiles">
+    <button class="tile" data-go="anatomie"><svg class="ic" viewBox="0 0 34 34"><circle cx="17" cy="9" r="5" fill="var(--accent)"/><path d="M14 13 Q8 22 5 30 M20 13 Q26 22 29 30" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/></svg><strong>Anatomie</strong><small>Planche interactive du clitoris</small></button>
+    <button class="tile" data-go="jeu"><svg class="ic" viewBox="0 0 34 34"><rect x="5" y="5" width="24" height="24" rx="7" fill="var(--gold)"/><circle cx="12" cy="12" r="2.4" fill="#fff"/><circle cx="17" cy="17" r="2.4" fill="#fff"/><circle cx="22" cy="22" r="2.4" fill="#fff"/></svg><strong>Le jeu</strong><small>Cartes et dés, chacun son tour</small></button>
+    <button class="tile" data-go="positions"><svg class="ic" viewBox="0 0 34 34"><circle cx="11" cy="17" r="7" fill="var(--accent)"/><circle cx="23" cy="17" r="7" fill="var(--plum-2)" opacity=".85"/></svg><strong>Positions</strong><small>Guide filtrable et favoris</small></button>
+    <button class="tile" data-go="desirs"><svg class="ic" viewBox="0 0 34 34"><rect x="6" y="5" width="16" height="22" rx="4" fill="var(--plum-2)" transform="rotate(-10 14 16)"/><rect x="12" y="7" width="16" height="22" rx="4" fill="var(--accent)"/></svg><strong>Nos envies</strong><small>Seules les envies communes apparaissent</small></button>
+  </div>
+</section>
+
+<!-- ============ PARCOURS ============ -->
+<section class="view" id="v-parcours" hidden>
+  <div class="eyebrow" style="margin-top:22px">Programme</div>
+  <h1 style="margin-top:4px">Les parcours</h1>
+  <p class="lead">Une étape par soirée ou par semaine, à votre rythme. Choisissez le parcours qui vous ressemble.</p>
+  <div class="chips" id="progChips" role="group" aria-label="Parcours"></div>
+  <h2 id="progTitle" style="margin-top:14px;margin-bottom:2px"></h2>
+  <p class="small muted" id="progDesc"></p>
+  <div class="card" id="lessons" style="padding-block:4px"></div>
+  <div class="sheet" id="lessonSheet" hidden style="margin-top:12px"></div>
+  <button class="linkbtn redo" id="redoOnb">Refaire le questionnaire de départ</button>
+</section>
+
+<!-- ============ SOIRÉE ============ -->
+<section class="view" id="v-soiree" hidden>
+  <div id="sSetup">
+    <div class="eyebrow" style="margin-top:22px">Stéphanie &amp; Antoine</div>
+    <h1 style="margin-top:4px">Mode Soirée</h1>
+    <p class="lead">Un enchaînement guidé : ambiance, connexion, massage, jeu, puis votre moment. Lancez-le et laissez-vous porter.</p>
+    <div class="card">
+      <label class="f" style="margin-top:0">Durée guidée</label>
+      <div class="chips" id="sDur" role="group" aria-label="Durée"></div>
+      <label class="f">Intensité des cartes</label>
+      <div class="chips" id="sLvl" role="group" aria-label="Intensité"></div>
+      <div class="sprev" id="sPrev"></div>
+      <button class="btn" id="sStart" style="width:100%;box-sizing:border-box;margin-top:14px">Commencer la soirée</button>
+    </div>
+  </div>
+  <div id="sRun" hidden>
+    <div class="sdots" id="sDots" style="margin-top:20px"></div>
+    <div class="sstep" id="sStep"></div>
+    <div class="snav"><button class="btn soft" id="sPrevB">Précédent</button><button class="btn" id="sNextB">Étape suivante</button></div>
+    <button class="linkbtn" id="sQuit" style="display:block;margin:14px auto 0">Arrêter la soirée</button>
+  </div>
+</section>
+
+
+<!-- ============ APPRENDRE ============ -->
+<section class="view" id="v-apprendre" hidden>
+  <div class="eyebrow" style="margin-top:22px">Bibliothèque</div>
+  <h1 style="margin-top:4px">Apprendre</h1>
+  <p class="lead">Des bases solides, expliquées clairement.</p>
+  <div class="tiles">
+    <button class="tile" data-go="anatomie"><strong>Anatomie</strong><small>Le clitoris en entier, partie par partie</small></button>
+    <button class="tile" data-go="zones"><strong>Zones érogènes</strong><small>Tout le corps est concerné</small></button>
+    <button class="tile" data-go="oral"><strong>Avec la bouche</strong><small>Étapes, gestes et rythme</small></button>
+    <button class="tile" data-go="penetration"><strong>Pénétration</strong><small>Confort et plaisir partagé</small></button>
+    <button class="tile" data-go="excitation"><strong>Le cycle du désir</strong><small>Comprendre comment l'excitation monte</small></button>
+    <button class="tile" data-go="consentement"><strong>Consentement</strong><small>Le socle de tout le reste</small></button>
+    <button class="tile" data-go="positions"><strong>Positions</strong><small>Guide filtrable et favoris</small></button>
+    <button class="tile" data-go="jeu"><strong>Le jeu</strong><small>Cartes et dés pour Stéphanie et Antoine</small></button>
+  </div>
+</section>
+
+<!-- ANATOMIE -->
+<section class="view" id="v-anatomie" hidden>
+  <div class="eyebrow" style="margin-top:22px">Planche 01</div>
+  <h1 style="margin-top:4px">Le clitoris, en entier</h1>
+  <p class="lead">Le gland visible n'est que la pointe. L'organe se prolonge à l'intérieur du corps et entoure l'entrée du vagin. Touchez une structure.</p>
+  <div class="plate" id="plate">
+    <div class="cap"><span>Vue de face, structures internes</span><span>≈ échelle 1:1,5</span></div>
+    <svg viewBox="0 0 340 330" role="img" aria-label="Planche anatomique du complexe clitoridien vu de face, avec l'os pubien, le gland, le corps, les deux piliers, les deux bulbes, l'urètre et l'entrée du vagin">
+      <defs>
+        <radialGradient id="gGlans" cx="40%" cy="35%" r="70%"><stop offset="0" style="stop-color:var(--accent-2)"/><stop offset="1" style="stop-color:var(--accent)"/></radialGradient>
+        <linearGradient id="gTissue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--tissue-2)"/><stop offset="1" style="stop-color:var(--tissue-1)"/></linearGradient>
+        <radialGradient id="gBulb" cx="50%" cy="40%" r="70%"><stop offset="0" style="stop-color:var(--bulb-1)"/><stop offset="1" style="stop-color:var(--bulb-2)"/></radialGradient>
+      </defs>
+      <!-- pubic arch -->
+      <g aria-hidden="true">
+        <path class="bone" d="M30 70 C60 40 120 28 170 28 C220 28 280 40 310 70 L318 98 C300 92 286 96 270 112 C240 146 214 182 200 230 L188 228 C196 180 214 140 236 110 C214 96 192 92 170 92 C148 92 126 96 104 110 C126 140 144 180 152 228 L140 230 C126 182 100 146 70 112 C54 96 40 92 22 98 Z"/>
+        <path d="M150 34 C162 52 178 52 190 34" class="lead-line" opacity=".5"/>
+        <text class="lbl" x="170" y="22" text-anchor="middle" opacity=".8">os pubien</text>
+      </g>
+      <!-- orifices -->
+      <g aria-hidden="true">
+        <ellipse class="orifice" cx="170" cy="232" rx="20" ry="34"/>
+        <ellipse cx="170" cy="168" rx="4.5" ry="5.5" fill="var(--muted)"/>
+      </g>
+      <!-- bulbs -->
+      <g class="part" data-p="bulbes" tabindex="0" role="button" aria-label="Bulbes vestibulaires">
+        <path class="bulb" d="M150 152 C124 158 112 192 116 232 C119 262 134 280 146 276 C156 272 152 246 150 222 C148 196 152 172 156 158 Z"/>
+        <path class="bulb" d="M190 152 C216 158 228 192 224 232 C221 262 206 280 194 276 C184 272 188 246 190 222 C192 196 188 172 184 158 Z"/>
+        <path class="hl" d="M128 196 C126 220 130 248 140 262 M212 196 C214 220 210 248 200 262"/>
+      </g>
+      <!-- crura -->
+      <g class="part" data-p="piliers" tabindex="0" role="button" aria-label="Piliers">
+        <path class="tissue" d="M160 120 C132 132 104 160 84 200 C74 220 70 240 74 252 C78 260 88 256 90 246 C96 216 116 178 150 146 C158 138 164 130 166 124 Z"/>
+        <path class="tissue" d="M180 120 C208 132 236 160 256 200 C266 220 270 240 266 252 C262 260 252 256 250 246 C244 216 224 178 190 146 C182 138 176 130 174 124 Z"/>
+        <path class="hl" d="M150 134 C122 156 100 192 86 236 M190 134 C218 156 240 192 254 236"/>
+      </g>
+      <!-- body -->
+      <g class="part" data-p="corps" tabindex="0" role="button" aria-label="Corps">
+        <path class="tissue" d="M154 70 C146 86 148 108 160 124 L180 124 C192 108 194 86 186 70 C176 64 164 64 154 70 Z"/>
+        <path class="hl" d="M170 72 L170 120"/>
+      </g>
+      <!-- nerve fibres -->
+      <g aria-hidden="true">
+        <path class="nerve" d="M170 64 C166 90 160 110 140 132 M170 64 C174 90 180 110 200 132 M170 66 C170 92 170 110 170 124"/>
+      </g>
+      <!-- glans & hood -->
+      <g class="part" data-p="gland" tabindex="0" role="button" aria-label="Gland">
+        <ellipse class="glans" cx="170" cy="62" rx="12" ry="10.5"/>
+        <ellipse cx="166" cy="58" rx="4" ry="3" fill="#fff" opacity=".35"/>
+      </g>
+      <g class="part" data-p="capuchon" tabindex="0" role="button" aria-label="Capuchon">
+        <path class="hood" d="M150 64 C150 40 190 40 190 64"/>
+        <path d="M150 64 C150 40 190 40 190 64" stroke="transparent" stroke-width="16" fill="none"/>
+      </g>
+      <!-- labels -->
+      <g>
+        <path class="lead-line" d="M190 46 L236 40"/><text class="lbl" x="240" y="43">capuchon</text>
+        <path class="lead-line" d="M182 62 L236 64"/><text class="lbl" x="240" y="67">gland</text>
+        <path class="lead-line" d="M152 96 L104 92"/><text class="lbl" x="100" y="95" text-anchor="end">corps</text>
+        <path class="lead-line" d="M80 236 L40 262"/><text class="lbl" x="36" y="274" text-anchor="middle">pilier</text>
+        <path class="lead-line" d="M260 236 L300 262"/><text class="lbl" x="304" y="274" text-anchor="middle">pilier</text>
+        <path class="lead-line" d="M132 268 L112 300"/><text class="lbl" x="112" y="314" text-anchor="middle">bulbe</text>
+        <path class="lead-line" d="M208 268 L228 300"/><text class="lbl" x="228" y="314" text-anchor="middle">bulbe</text>
+        <path class="lead-line" d="M175 168 L236 160"/><text class="lbl" x="240" y="163">urètre</text>
+        <path class="lead-line" d="M170 266 L170 304"/><text class="lbl" x="170" y="318" text-anchor="middle">vagin</text>
+      </g>
+    </svg>
+  </div>
+  <div class="chips" id="partChips" style="margin-top:12px"></div>
+  <div class="card" id="partInfo"><h3>Touchez une structure</h3><p class="muted" style="margin:0">Chaque partie réagit différemment au toucher. Le gland est le plus sensible ; le reste s'atteint à travers les lèvres et la paroi du vagin.</p></div>
+  <h2>En chiffres</h2>
+  <div class="facts">
+    <div class="fact"><b>≈ 10 cm</b><span>longueur totale de l'organe</span></div>
+    <div class="fact"><b>≈ 8 000</b><span>terminaisons nerveuses dans le gland</span></div>
+    <div class="fact"><b>×2</b><span>volume possible des bulbes avec l'excitation</span></div>
+  </div>
+  <div class="callout" style="margin-top:14px"><b>À retenir :</b> le clitoris est érectile. Il gonfle avec l'excitation et devient plus réceptif. Plus les préliminaires sont longs, plus toute la zone est sensible.</div>
+</section>
+
+<!-- ZONES -->
+<section class="view" id="v-zones" hidden>
+  <div class="eyebrow" style="margin-top:22px">Planche 02</div>
+  <h1 style="margin-top:4px">Zones érogènes</h1>
+  <p class="lead">Le plaisir ne commence pas entre les jambes. Touchez un point pour un conseil.</p>
+  <div class="card bodymap" id="bodymap">
+    <svg viewBox="0 0 220 400" role="img" aria-label="Silhouette avec les principales zones érogènes">
+      <g aria-hidden="true">
+        <circle class="sil" cx="110" cy="46" r="28"/>
+        <path class="sil" d="M98 72 L122 72 L124 90 C150 92 170 100 176 122 L186 210 C188 222 176 226 172 214 L160 140 L158 200 C162 230 160 252 152 272 L148 370 C148 384 128 384 128 370 L118 282 L102 282 L92 370 C92 384 72 384 72 370 L68 272 C60 252 58 230 62 200 L60 140 L48 214 C44 226 32 222 34 210 L44 122 C50 100 70 92 96 90 Z"/>
+      </g>
+      <g id="zonesG"></g>
+    </svg>
+    <div class="zpop" id="zpop" hidden role="dialog" aria-live="polite"><button class="zx" id="zx" aria-label="Fermer">×</button><h3 id="zpT"></h3><p id="zpP"></p></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>zone sensible</span><span><i style="background:var(--accent);opacity:.5"></i>à découvrir ensemble</span></div>
+  </div>
+  <p class="small muted" style="margin:10px 2px 0">Touchez un point lumineux. La sensibilité varie d'une personne à l'autre et selon le moment : demandez-lui de noter chaque zone de 1 à 5.</p>
+  <div class="callout" style="margin-top:12px"><b>Exercice :</b> 10 minutes de caresses sur tout le corps en évitant volontairement les zones génitales. L'attente fait monter le désir.</div>
+</section>
+
+<!-- ORAL -->
+<section class="view" id="v-oral" hidden>
+  <div class="eyebrow" style="margin-top:22px">Technique</div>
+  <h1 style="margin-top:4px">Avec la bouche</h1>
+  <p class="lead">L'ordre compte : partir de loin, puis se rapprocher lentement.</p>
+  <div class="card steps">
+    <div class="step"><div class="dot">1</div><div><b>Tourner autour</b><p>Baisers sur le ventre, l'intérieur des cuisses, les hanches. On fait monter l'envie.</p></div></div>
+    <div class="step"><div class="dot">2</div><div><b>Indirect d'abord</b><p>Langue large et souple, de bas en haut sur toute la vulve, sans viser le gland tout de suite.</p></div></div>
+    <div class="step"><div class="dot">3</div><div><b>Explorer</b><p>Tester les gestes ci-dessous un par un et observer ses réactions.</p></div></div>
+    <div class="step"><div class="dot">4</div><div><b>Se fixer</b><p>Quand un geste marche, garder exactement le même rythme et la même pression.</p></div></div>
+    <div class="step"><div class="dot">5</div><div><b>Ajouter les mains</b><p>Caresses sur le corps, ou un à deux doigts à l'intérieur, paume vers le haut, mouvement « viens ici ».</p></div></div>
+  </div>
+  <h2>Les gestes de base</h2>
+  <p class="small muted" style="margin-top:-4px">Le cercle représente le gland du clitoris ; la ligne, le mouvement de la langue.</p>
+  <div class="moves">
+    <div class="move"><svg viewBox="0 0 140 70" aria-hidden="true"><circle class="mv-target" cx="70" cy="18" r="8"/><path class="mv-path anim" d="M70 64 C70 50 70 38 70 30"/></svg><b>Langue plate</b><span>Large, lente, de bas en haut. Pour commencer.</span></div>
+    <div class="move"><svg viewBox="0 0 140 70" aria-hidden="true"><circle class="mv-target" cx="70" cy="35" r="8"/><path class="mv-path anim" d="M70 15 A20 20 0 1 1 69.9 15"/></svg><b>Cercles</b><span>Autour du gland plutôt que dessus.</span></div>
+    <div class="move"><svg viewBox="0 0 140 70" aria-hidden="true"><circle class="mv-target" cx="70" cy="35" r="8"/><path class="mv-path anim" d="M40 35 L56 35 M84 35 L100 35"/><path class="mv-path" d="M44 29 L38 35 L44 41 M96 29 L102 35 L96 41"/></svg><b>Gauche-droite</b><span>Pointe de la langue, petits mouvements.</span></div>
+    <div class="move"><svg viewBox="0 0 140 70" aria-hidden="true"><circle class="mv-target" cx="70" cy="35" r="8"/><circle cx="70" cy="35" r="18" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity=".55"/><circle cx="70" cy="35" r="28" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity=".25"/></svg><b>Douce succion</b><span>Lèvres autour du gland, très légèrement.</span></div>
+  </div>
+  <h2>L'erreur la plus courante</h2>
+  <div class="chart" id="curveChart"></div>
+</section>
+
+<!-- PENETRATION -->
+<section class="view" id="v-penetration" hidden>
+  <div class="eyebrow" style="margin-top:22px">Technique</div>
+  <h1 style="margin-top:4px">La pénétration</h1>
+  <p class="lead">Avec l'excitation, le vagin s'allonge, s'élargit en profondeur et se lubrifie. Les préliminaires préparent le corps.</p>
+  <div class="card steps">
+    <div class="step"><div class="dot">1</div><div><b>Attendre qu'elle soit prête</b><p>Bien excitée, et qu'elle en ait envie. Demandez si vous avez un doute.</p></div></div>
+    <div class="step"><div class="dot">2</div><div><b>Lubrifiant</b><p>Aucune honte, ça change tout. Base d'eau avec les préservatifs.</p></div></div>
+    <div class="step"><div class="dot">3</div><div><b>Entrer lentement</b><p>Laissez son corps s'habituer. Au début, laissez-la guider le rythme et la profondeur.</p></div></div>
+    <div class="step"><div class="dot">4</div><div><b>Garder le clitoris dans le jeu</b><p>La majorité des femmes ont besoin d'une stimulation du clitoris pour jouir, même pendant la pénétration.</p></div></div>
+  </div>
+  <h2>Ce qui aide</h2>
+  <div class="moves">
+    <div class="move"><b>Frotter plutôt que pousser</b><span>Rester collés, petits mouvements de bassin qui frottent le haut de la vulve.</span></div>
+    <div class="move"><b>Une main libre</b><span>Vos doigts ou les siens sur le clitoris, au rythme qu'elle préfère.</span></div>
+    <div class="move"><b>Un coussin</b><span>Sous ses hanches, il change l'angle et le contact.</span></div>
+    <div class="move"><b>Pas de chrono</b><span>On ralentit, on s'embrasse, on revient aux caresses.</span></div>
+  </div>
+  <div class="callout" style="margin-top:14px"><b>Douleur = on arrête</b> et on en parle. Une douleur qui revient mérite l'avis d'un médecin, d'une sage-femme ou d'un gynécologue. Protection et contraception se décident ensemble.</div>
+  <div class="row" style="margin-top:14px"><button class="btn" data-go="positions">Voir le guide des positions</button></div>
+</section>
+
+<!-- EXCITATION -->
+<section class="view" id="v-excitation" hidden>
+  <div class="eyebrow" style="margin-top:22px">Comprendre</div>
+  <h1 style="margin-top:4px">Le cycle du désir</h1>
+  <p class="lead">Le désir n'est pas un interrupteur. Il a des accélérateurs et des freins, différents pour chacun.</p>
+  <div class="chart" id="phaseChart"></div>
+  <h2>Désir spontané, désir réactif</h2>
+  <p>Beaucoup de femmes, surtout en couple installé, ressentent un désir <b>réactif</b> : l'envie arrive après le début des caresses, pas avant. Ce n'est pas un manque d'attirance, c'est un fonctionnement normal.</p>
+  <div class="moves">
+    <div class="move"><b style="color:var(--ok)">Accélérateurs</b><span>Se sentir désirée, détente, tendresse dans la journée, nouveauté, temps devant soi.</span></div>
+    <div class="move"><b style="color:var(--no)">Freins</b><span>Stress, fatigue, charge mentale, peur d'avoir mal, sentiment d'être pressée.</span></div>
+  </div>
+  <div class="callout" style="margin-top:14px"><b>Conseil :</b> demandez-lui ce qui l'aide à « entrer dans l'ambiance ». Souvent, enlever un frein (vaisselle faite, enfants couchés, téléphone loin) compte plus qu'ajouter un accélérateur.</div>
+</section>
+
+<!-- CONSENTEMENT -->
+<section class="view" id="v-consentement" hidden>
+  <div class="eyebrow" style="margin-top:22px">Le socle</div>
+  <h1 style="margin-top:4px">Consentement</h1>
+  <p class="lead">Le consentement rend le sexe meilleur : quand on se sent libre de dire non, on se lâche davantage quand on dit oui.</p>
+  <div class="stack">
+    <div class="card"><h3>Libre</h3><p class="muted" style="margin:0">Sans pression, sans chantage, sans insister.</p></div>
+    <div class="card"><h3>Enthousiaste</h3><p class="muted" style="margin:0">Un vrai oui se voit et s'entend. Le silence n'est pas un oui.</p></div>
+    <div class="card"><h3>Spécifique</h3><p class="muted" style="margin:0">Oui à une chose n'est pas oui à tout.</p></div>
+    <div class="card"><h3>Réversible</h3><p class="muted" style="margin:0">On peut changer d'avis à tout moment, même en plein milieu.</p></div>
+  </div>
+  <h2>Phrases simples à utiliser</h2>
+  <div class="card stack">
+    <span>« Tu aimes quand je fais ça ? »</span>
+    <span>« Tu veux que je continue ? »</span>
+    <span>« Montre-moi comment tu préfères. »</span>
+    <span>« On fait une pause ? »</span>
+  </div>
+</section>
+
+<!-- ============ POSITIONS ============ -->
+<section class="view" id="v-positions" hidden>
+  <div class="eyebrow" style="margin-top:22px">Guide</div>
+  <h1 style="margin-top:4px">Positions</h1>
+  <p class="lead">Classées selon ce qui compte pour son plaisir. Le symbole indique l'orientation des corps : rose pour elle, violet pour lui.</p>
+  <div class="chips" id="posFilters" role="group" aria-label="Filtrer"></div>
+  <div class="stack" id="posList" style="margin-top:6px"></div>
+</section>
+
+<!-- ============ À DEUX ============ -->
+<section class="view" id="v-desirs" hidden>
+  <div class="eyebrow" style="margin-top:22px">À deux</div>
+  <h1 style="margin-top:4px">Nos envies</h1>
+  <p class="lead">Chacun répond seul, sans regarder. Seules les envies que vous partagez apparaissent ensuite. Un « non » reste secret.</p>
+  <div class="who" role="group" aria-label="Qui répond">
+    <button data-who="elle" aria-pressed="true">Stéphanie</button>
+    <button data-who="lui" aria-pressed="false">Antoine</button>
+    <button data-who="match" aria-pressed="false">En commun</button>
+  </div>
+  <div class="syncnote" id="syncNote" hidden>Deux téléphones : vous répondez sur le vôtre, l'autre sur le sien. Les envies communes s'affichent chez vous deux.</div>
+  <div id="deckZone">
+    <div class="chips" id="lvlChips" style="margin-top:12px" role="group" aria-label="Niveau"></div>
+    <div class="deck" id="deck"></div>
+    <div class="vote" id="voteBtns">
+      <button class="n" data-v="non">Non</button>
+      <button class="m" data-v="peut">Peut-être</button>
+      <button class="y" data-v="oui">Oui</button>
+    </div>
+  </div>
+  <div id="matchZone" hidden style="margin-top:12px">
+    <div class="stat" id="matchStat"></div>
+    <h2>À essayer</h2>
+    <div class="match" id="matchYes"></div>
+    <h2>À en discuter</h2>
+    <p class="small muted" style="margin-top:-4px">Un oui d'un côté, un peut-être de l'autre. On en parle avant, sans pression.</p>
+    <div class="match" id="matchMaybe"></div>
+    <h2>Déjà vécu</h2>
+    <div class="match" id="matchDone"></div>
+    <div class="row" style="margin-top:18px;flex-wrap:wrap">
+      <button class="btn ghost" id="resetDeck">Recommencer les réponses</button>
+      <span id="resetConfirm" hidden class="row"><span class="small">Effacer pour vous deux ?</span><button class="btn" id="resetYes">Effacer</button><button class="btn soft" id="resetNo">Annuler</button></span>
+    </div>
+  </div>
+  <h2>Échanger avec l'autre téléphone</h2>
+  <div class="card xch">
+    <p class="small muted" style="margin-top:0">Chacun répond sur son téléphone, puis envoie son code à l'autre par message. Le code contient vos réponses et la liste « Déjà vécu ». Rien ne passe par un serveur.</p>
+    <div class="row" style="flex-wrap:wrap"><button class="btn soft" data-xp="elle">Code de Stéphanie</button><button class="btn soft" data-xp="lui">Code d'Antoine</button></div>
+    <div id="xOut" hidden style="margin-top:12px">
+      <label class="f" for="xCode" id="xLbl" style="margin-top:0">Code</label>
+      <input type="text" id="xCode" readonly>
+      <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn" id="xCopy">Copier le code</button><button class="btn ghost" id="xShare" hidden>Envoyer par message</button><span class="small muted" id="xCopied" role="status"></span></div>
+    </div>
+    <label class="f" for="xIn">Coller le code reçu</label>
+    <textarea id="xIn" rows="2" placeholder="AD1-…"></textarea>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn" id="xImp">Importer</button><span class="small" id="xMsg" role="status"></span></div>
+  </div>
+</section>
+
+<!-- JEU -->
+<section class="view" id="v-jeu" hidden>
+  <div class="eyebrow" style="margin-top:22px">Stéphanie &amp; Antoine</div>
+  <h1 style="margin-top:4px" id="gTitle">Les jeux</h1>
+  <p class="lead" id="gLead">Choisissez un jeu. Une seule règle partout : on peut toujours passer, sans se justifier.</p>
+
+  <div id="gHub">
+    <div class="ghub">
+      <button class="gtile" data-game="cartes" style="--g1:#C04A84;--g2:#6E4FA8;--i:0"><svg class="gic" viewBox="0 0 32 32"><rect x="5" y="7" width="14" height="20" rx="3" transform="rotate(-12 12 17)"/><rect x="13" y="5" width="14" height="20" rx="3"/><path d="M20 12.5c-1-1.6-3.6-1-3.4 1 .2 1.6 3.4 3.5 3.4 3.5s3.2-1.9 3.4-3.5c.2-2-2.4-2.6-3.4-1z" fill="#fff" stroke="none"/></svg><span>Défis</span><b>Cartes</b><small class="gsc" data-g="cartes"></small></button>
+      <button class="gtile" data-game="av" style="--g1:#A8215F;--g2:#4E2E7A;--i:1"><svg class="gic" viewBox="0 0 32 32"><path d="M8 12a5 5 0 1 1 7 4.6c-1.3.6-2 1.4-2 2.9"/><circle cx="13" cy="24" r="1.4" fill="#fff" stroke="none"/><path d="M22 6l2 5 5 .5-4 3.5 1.2 5L22 17l-4.2 3 1.2-5-4-3.5 5-.5z" fill="rgba(255,255,255,.25)"/></svg><span>Classique</span><b>Action ou vérité</b><small class="gsc" data-g="av"></small></button>
+      <button class="gtile" data-game="roue" style="--g1:#C9963F;--g2:#8A2D5C;--i:2"><svg class="gic" viewBox="0 0 32 32"><circle cx="16" cy="17" r="11"/><path d="M16 6v22M5 17h22M8.2 9.2l15.6 15.6M23.8 9.2L8.2 24.8"/><path d="M13 2.5h6L16 7z" fill="#fff" stroke="none"/></svg><span>Hasard</span><b>La roue</b><small class="gsc" data-g="roue"></small></button>
+      <button class="gtile" data-game="des" style="--g1:#8A5B17;--g2:#4E2E7A;--i:3"><svg class="gic" viewBox="0 0 32 32"><path d="M16 4l11 6v12l-11 6-11-6V10z"/><path d="M5 10l11 6 11-6M16 16v12"/><circle cx="16" cy="10" r="1.4" fill="#fff" stroke="none"/><circle cx="10" cy="17" r="1.4" fill="#fff" stroke="none"/><circle cx="10" cy="22" r="1.4" fill="#fff" stroke="none"/><circle cx="22" cy="19.5" r="1.4" fill="#fff" stroke="none"/></svg><span>Hasard</span><b>Les dés</b><small class="gsc" data-g="des"></small></button>
+      <button class="gtile" data-game="tp" style="--g1:#7B5BB0;--g2:#2B1A47;--i:4"><svg class="gic" viewBox="0 0 32 32"><path d="M16 5v22M8 27h16M6 9h20"/><path d="M6 9l-4 9a4 4 0 0 0 8 0zM26 9l-4 9a4 4 0 0 0 8 0z"/></svg><span>Complicité</span><b>Tu préfères</b><small class="gsc" data-g="tp"></small></button>
+      <button class="gtile" data-game="quiz" style="--g1:#D9487F;--g2:#7E1846;--i:5"><svg class="gic" viewBox="0 0 32 32"><circle cx="11" cy="12" r="5"/><circle cx="21" cy="12" r="5"/><path d="M3 27c1-5 4-7 8-7s7 2 8 7M14 27c1-5 4-7 8-7s6 2 7 7" opacity=".9"/></svg><span>Complicité</span><b>Qui me connaît ?</b><small class="gsc" data-g="quiz"></small></button>
+      <button class="gtile" data-game="jamais" style="--g1:#6E4FA8;--g2:#7E1846;--i:6"><svg class="gic" viewBox="0 0 32 32"><path d="M10 16V7a2 2 0 0 1 4 0v8M14 14V5a2 2 0 0 1 4 0v10M18 14V7a2 2 0 0 1 4 0v10M22 13a2 2 0 0 1 4 0v5c0 6-4 10-9 10-4 0-6-2-8-5l-4-6a2 2 0 0 1 3-2.5l3 3"/></svg><span>Aveux</span><b>Je n'ai jamais</b><small class="gsc" data-g="jamais"></small></button>
+      <button class="gtile" data-game="perso" style="--g1:#4E2E7A;--g2:#2B1A47;--i:7"><svg class="gic" viewBox="0 0 32 32"><path d="M20 5l7 7-15 15H5v-7z"/><path d="M17 8l7 7"/></svg><span>Sur mesure</span><b>Mes cartes</b><small class="gsc" data-g="perso"></small></button>
+    </div>
+  </div>
+
+  <div id="gBackRow" hidden><button class="back" id="gBack" style="margin:6px 0 4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Tous les jeux</button></div>
+  <div class="pscore" id="pScore" hidden></div>
+
+  <!-- CARTES -->
+  <div class="gpanel" id="g-cartes" hidden>
+    <div class="chips lvlc" data-for="cartes" role="group" aria-label="Intensité"></div>
+    <div class="turn"><div class="avatar" id="cTurn"></div><span class="small muted" id="cInfo"></span></div>
+    <div class="table" id="cTable">
+      <div class="deckstack" aria-hidden="true"><div class="cb"></div><div class="cb"></div><div class="cb"></div></div>
+      <div class="fcard" id="cCard" role="button" tabindex="0" aria-live="polite">
+        <div class="inner">
+          <div class="face back"><div class="mono">S<i>&amp;</i>A</div><div class="hint" id="cHint">Touchez pour tirer une carte</div></div>
+          <div class="face front" id="cFront"></div>
+        </div>
+      </div>
+    </div>
+    <p class="small muted" style="text-align:center;margin:10px 0 0">Carte retournée : glissez à droite si c'est fait, à gauche pour passer.</p>
+    <div class="gactions" id="cAct" hidden><button class="btn soft" id="cPass">Passer</button><button class="btn" id="cDone">Fait, au suivant</button></div>
+  </div>
+
+  <!-- ACTION OU VERITE -->
+  <div class="gpanel" id="g-av" hidden>
+    <div class="chips lvlc" data-for="av" role="group" aria-label="Intensité"></div>
+    <div class="turn"><div class="avatar" id="avTurn"></div><span class="small muted">Choisissez</span></div>
+    <div class="gcard" id="avCard"></div>
+    <div class="gactions" id="avPick" style="grid-template-columns:1fr 1fr"><button class="btn soft" data-k="v">Vérité</button><button class="btn" data-k="a">Action</button></div>
+    <div class="gactions" id="avNext" hidden><button class="btn soft" id="avPass">Passer</button><button class="btn" id="avDone">Fait, au suivant</button></div>
+  </div>
+
+  <!-- ROUE -->
+  <div class="gpanel" id="g-roue" hidden>
+    <div class="turn"><div class="avatar" id="rTurn"></div><span class="small muted">Tournez la roue</span></div>
+    <div class="wheel-wrap">
+      <div class="pointer" aria-hidden="true"></div>
+      <svg id="wheel" viewBox="0 0 300 300" role="img" aria-label="Roue de défis"></svg>
+    </div>
+    <div class="card" id="rRes" style="margin-top:12px"><p class="muted" style="margin:0">La roue choisit un défi au hasard.</p></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="rSpin" style="flex:1">Tourner la roue</button></div>
+  </div>
+
+  <!-- DES -->
+  <div class="gpanel" id="g-des" hidden>
+    <div class="turn"><div class="avatar" id="dTurn"></div><button class="chip" id="dSwap">Changer de joueur</button></div>
+    <div class="dice3d" id="dice3d"></div>
+    <div class="dlabels"><span>Action</span><span>Zone</span><span>Durée</span></div>
+    <div class="gcard dres" id="dRes" hidden></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="dRoll" style="flex:1">Lancer les dés</button></div>
+  </div>
+
+  <!-- TU PREFERES -->
+  <div class="gpanel" id="g-tp" hidden>
+    <div class="turn"><div class="avatar" id="tpTurn"></div><span class="small muted" id="tpInfo"></span></div>
+    <div class="card" id="tpBox"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="gpanel" id="g-quiz" hidden>
+    <div class="turn"><div class="avatar" id="qzTurn"></div><span class="small muted" id="qzInfo"></span></div>
+    <div class="card" id="qzBox"></div>
+  </div>
+
+  <!-- JAMAIS -->
+  <div class="gpanel" id="g-jamais" hidden>
+    <div class="gcard" id="jmCard" style="background:linear-gradient(150deg,#6E4FA8,#7E1846)"></div>
+    <p class="small muted" style="margin:10px 2px 6px">Chacun indique s'il l'a déjà fait. Le gage dépend de vos réponses.</p>
+    <div id="jmAns"></div>
+    <div class="card" id="jmRes" hidden style="margin-top:10px"></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="jmNext" style="flex:1">Carte suivante</button></div>
+  </div>
+
+  <!-- PERSO -->
+  <div class="gpanel" id="g-perso" hidden>
+    <div class="card">
+      <h3>Nouvelle carte</h3>
+      <p class="small muted">Écrivez librement. Utilisez <b>{A}</b> pour la personne qui joue et <b>{B}</b> pour l'autre : les prénoms s'insèrent automatiquement.</p>
+      <label class="f" for="pTxt">Le défi</label>
+      <textarea id="pTxt" rows="3" placeholder="Ex. : {A} prépare un bain à {B} et le rejoint."></textarea>
+      <label class="f">Intensité</label>
+      <div class="chips" id="pLvl" role="group" aria-label="Intensité"></div>
+      <label class="f">Chrono</label>
+      <div class="chips" id="pSec" role="group" aria-label="Chrono"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="pAdd">Ajouter au jeu de cartes</button><span class="small muted" id="pMsg" role="status"></span></div>
+    </div>
+    <h2>Vos cartes</h2>
+    <div class="card" id="pList" style="padding-block:4px"></div>
+    <p class="small muted" style="margin-top:8px">Vos cartes apparaissent dans le jeu « Cartes », au niveau choisi.</p>
+  </div>
+
+  <h2 id="gRulesH">Les règles</h2>
+  <div class="card rules" id="gRules">
+    <ol style="margin:0;padding-left:20px">
+      <li>On choisit l'intensité ensemble avant de commencer.</li>
+      <li>« Passer » est toujours accepté, sans négocier ni bouder.</li>
+      <li>Le chrono est là pour faire durer le plaisir, pas pour presser.</li>
+      <li>On peut arrêter le jeu à tout moment pour… passer à la suite.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- JOURNAL -->
+<section class="view" id="v-journal" hidden>
+  <div class="eyebrow" style="margin-top:22px">À deux</div>
+  <h1 style="margin-top:4px">Journal</h1>
+  <p class="lead">Un débrief de deux minutes après un moment à deux. C'est ainsi que l'on progresse ensemble.</p>
+  <div class="card">
+    <h3>Nouveau moment</h3>
+    <label class="f">Connexion entre nous</label><div class="rate" data-k="cx"></div>
+    <label class="f">Plaisir pour Stéphanie</label><div class="rate" data-k="pe"></div>
+    <label class="f">Plaisir pour Antoine</label><div class="rate" data-k="pl"></div>
+    <label class="f" for="jKeep">Ce qu'on garde</label><input type="text" id="jKeep" placeholder="Ex. : les caresses lentes au début">
+    <label class="f" for="jTry">Ce qu'on essaie la prochaine fois</label><input type="text" id="jTry" placeholder="Ex. : elle au-dessus">
+    <div class="row" style="margin-top:14px"><button class="btn" id="jSave">Enregistrer</button><span id="jMsg" class="small muted" role="status"></span></div>
+  </div>
+  <div class="rit-h"><h2>Vos badges</h2><span class="streak hot" id="bCount">0</span></div>
+  <div class="badges" id="badges"></div>
+  <h2>Tendance</h2>
+  <div class="card spark" id="spark"></div>
+  <h2>Historique</h2>
+  <div class="card" id="jList" style="padding-block:4px"></div>
+  <p class="small muted" style="margin-top:8px">Tout reste sur ce téléphone, rien n'est envoyé.</p>
+</section>
+</main>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="in">
+    <a href="#accueil" data-t="accueil"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></svg>Accueil</a>
+    <a href="#apprendre" data-t="apprendre"><svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Apprendre</a>
+    <a href="#jeu" data-t="jeu"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Jeu</a>
+    <a href="#desirs" data-t="desirs"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>Envies</a>
+    <a href="#journal" data-t="journal"><svg viewBox="0 0 24 24"><path d="M6 3h11a1 1 0 0 1 1 1v16l-3-2-3 2-3-2-3 2V4a1 1 0 0 1 1-1z"/><path d="M9 8h6M9 12h6"/></svg>Journal</a>
+  </div>
+</nav>
+
+<div class="onb" id="onb" hidden role="dialog" aria-modal="true" aria-label="Questionnaire de départ">
+  <div class="wrap">
+    <div class="row" style="justify-content:space-between;margin-bottom:18px"><div class="brand"><i></i>À Deux</div><button class="linkbtn" id="onbSkip">Passer</button></div>
+    <div id="onbBox"></div>
+  </div>
+</div>
+
+<div class="sheet-bg" id="syncBg" hidden>
+  <div class="sheet2" role="dialog" aria-modal="true" aria-labelledby="syncT">
+    <div class="grab"></div>
+    <h2 id="syncT" style="margin-top:4px">Deux téléphones</h2>
+    <p class="small muted" style="margin:0">Sur ce téléphone, je suis :</p>
+    <div class="seg3" id="meSeg" role="group" aria-label="Qui utilise ce téléphone"></div>
+    <div class="callout" id="syncState" style="margin:8px 0 12px"></div>
+    <b>Pour connecter le téléphone de Stéphanie</b>
+    <ol class="steps-sm">
+      <li>Ouvrez le menu Partager de cette page et ajoutez Stéphanie avec le rôle Contributeur ou Éditeur. Elle aura besoin d'un compte Claude.</li>
+      <li>Sur son téléphone, elle ouvre la page et choisit « Stéphanie » ici. Vous choisissez « Antoine » sur le vôtre.</li>
+      <li>Chacun remplit « Nos envies » de son côté. Les envies communes et la liste « Déjà vécu » apparaissent chez vous deux.</li>
+    </ol>
+    <p class="small muted">Les jeux, le journal et le rituel restent propres à chaque téléphone.</p>
+    <button class="btn" id="syncClose" style="width:100%;box-sizing:border-box;margin-top:6px">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+/* ---------- storage ---------- */
+const KEY="adeux-v2";
+let S={done:{},fav:{},votes:{elle:{},lui:{}},journal:[]};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s)S=Object.assign(S,s)}catch(e){}
+let save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+/* ---------- lecture à voix haute ---------- */
+const TTS=("speechSynthesis" in window)?{say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t).replace(/\s+/g," ").trim());u.lang="fr-FR";u.rate=.95;const v=speechSynthesis.getVoices().find(v=>/^fr/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}},stop(){try{speechSynthesis.cancel()}catch(e){}}}:null;
+function spk(){return TTS?`<button type="button" class="spk" aria-label="Lire à voix haute"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>`:""}
+document.addEventListener("click",e=>{const b=e.target.closest(".spk");if(!b||!TTS)return;e.stopPropagation();
+  const root=b.closest(".face,.gcard,.sstep,.sheet,.card")||document.body;const el=root.querySelector("[data-say]")||root.querySelector(".txt");
+  if(b.classList.contains("on")){TTS.stop();b.classList.remove("on");return}
+  $$(".spk.on").forEach(x=>x.classList.remove("on"));b.classList.add("on");TTS.say(el?el.textContent:"");setTimeout(()=>b.classList.remove("on"),6000)},true);
+
+/* ---------- glisser les cartes ---------- */
+function swipeable(el,o){if(!el)return;let x0=0,y0=0,dx=0,dy=0,on=false,moved=false,id=null;const TH=80;
+  el.style.touchAction=o.up?"none":"pan-y";
+  const st=k=>el.querySelector(".st-"+k);
+  const setSt=()=>{if(!o.stamps)return;const r=Math.max(0,Math.min(1,dx/TH)),l=Math.max(0,Math.min(1,-dx/TH)),u=o.up&&Math.abs(dx)<TH?Math.max(0,Math.min(1,-dy/TH)):0;st("oui").style.opacity=r;st("non").style.opacity=l;st("peut").style.opacity=u};
+  el.addEventListener("pointerdown",e=>{if(o.enabled&&!o.enabled())return;if(e.target.closest("button"))return;on=true;moved=false;x0=e.clientX;y0=e.clientY;dx=dy=0;id=e.pointerId});
+  el.addEventListener("pointermove",e=>{if(!on||e.pointerId!==id)return;dx=e.clientX-x0;dy=e.clientY-y0;
+    if(!moved&&!o.up&&Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>8){on=false;return}
+    if(!moved&&(Math.abs(dx)>8||Math.abs(dy)>8)){moved=true;el.style.transition="none";try{el.setPointerCapture(id)}catch(_){}}
+    if(moved){el.style.transform=`translate(${dx}px,${o.up&&dy<0?dy:0}px) rotate(${dx/18}deg)`;setSt()}});
+  const end=()=>{if(!on)return;on=false;if(!moved)return;el._dragged=true;setTimeout(()=>el._dragged=false,60);
+    const go=(tx,ty,fn)=>{el.style.transition="transform .26s ease-in,opacity .26s";el.style.transform=`translate(${tx}px,${ty}px) rotate(${tx/14}deg)`;el.style.opacity="0";setTimeout(()=>{el.style.transition="none";el.style.transform="";el.style.opacity="";fn();requestAnimationFrame(()=>el.style.transition="")},260)};
+    if(dx>TH&&o.onRight)go(innerWidth,0,o.onRight);else if(dx<-TH&&o.onLeft)go(-innerWidth,0,o.onLeft);else if(o.up&&dy<-TH&&Math.abs(dx)<TH&&o.onUp)go(0,-innerHeight/2,o.onUp);
+    else{el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1)";el.style.transform="";if(o.stamps)["oui","non","peut"].forEach(k=>st(k).style.opacity=0)}};
+  el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end);
+}
+let _bt=null;function scheduleBadges(){clearTimeout(_bt);_bt=setTimeout(()=>{try{checkBadges()}catch(e){}},250)}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- routing ---------- */
+const tabOf={accueil:"accueil",parcours:"accueil",soiree:"accueil",apprendre:"apprendre",anatomie:"apprendre",zones:"apprendre",oral:"apprendre",penetration:"apprendre",excitation:"apprendre",consentement:"apprendre",positions:"apprendre",jeu:"jeu",desirs:"desirs",journal:"journal"};
+const sub=["anatomie","zones","oral","penetration","excitation","consentement","positions"];
+function route(){
+  let v=location.hash.slice(1); if(!tabOf[v]) v="accueil";
+  $$(".view").forEach(s=>s.hidden=s.id!=="v-"+v);
+  $$("nav.tabs a").forEach(a=>a.dataset.t===tabOf[v]?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
+  const toHome=v==="parcours"||v==="soiree";const isSub=sub.includes(v)||toHome;
+  $("#back").hidden=!isSub; $("#brand").hidden=isSub;
+  $("#back").lastChild.textContent=toHome?"Accueil":"Apprendre";
+  $("#back").onclick=()=>location.hash=toHome?"accueil":"apprendre";
+  window.scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)location.hash=g.dataset.go});
+
+/* ---------- question du jour ---------- */
+const QS=["Quel est le moment où tu t'es sentie la plus désirée par moi ?","Qu'est-ce qui t'aide à te détendre et à avoir envie ?","Y a-t-il une caresse que tu aimerais que je fasse plus souvent ?","Plutôt lent et tendre, ou plus intense ? Ça dépend de quoi ?","Quel endroit de ton corps est sous-estimé ?","Qu'est-ce qui te coupe l'envie, même un peu ?","Si on avait toute une soirée rien que pour nous, tu la verrais comment ?","Qu'est-ce que tu aimerais qu'on essaie, sans obligation ?","Comment tu préfères que je te dise que j'ai envie de toi ?","Quel souvenir à deux te donne encore des frissons ?","Est-ce qu'il y a quelque chose que tu n'oses pas me demander ?","Qu'est-ce qui fait que tu te sens en confiance avec moi ?"];
+let qi=Math.floor(Date.now()/864e5)%QS.length;
+const setQ=()=>$("#qday").textContent="« "+QS[qi]+" »";
+$("#qdayDate").textContent=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+$("#qnext").onclick=()=>{qi=(qi+1)%QS.length;setQ()};setQ();
+
+/* ---------- parcours thématiques ---------- */
+const PR={
+decouverte:{t:"Découverte",d:"Les bases pour mieux se connaître, en 7 étapes.",s:[
+ ["Parler de nos envies","15 min · conversation",["Choisissez un moment calme, hors de la chambre.","Chacun complète « Nos envies » seul, sans regarder.","Regardez ensemble l'onglet « En commun » et choisissez une idée."],"Le but n'est pas de tout faire, mais de savoir ce qui fait envie à l'autre."],
+ ["Comprendre l'anatomie","10 min · lecture",["Lisez ensemble la planche « Le clitoris, en entier ».","Demandez-lui quelles zones elle préfère et lesquelles sont trop sensibles.","Vérifiez vos connaissances : où sont les piliers ? les bulbes ?"],"Connaître le terrain évite de chercher au hasard."],
+ ["Toucher sans but","20 min · exercice",["Elle s'allonge, vêtements légers ou nue selon son envie.","Caresses sur tout le corps, en évitant seins et zone génitale.","Elle dit seulement « plus », « moins » ou « ailleurs ». Puis on inverse."],"Exercice classique de sexothérapie : on apprend à recevoir sans pression de résultat."],
+ ["Cartographier son corps","20 min · exercice",["Reprenez l'exercice précédent, seins inclus.","Elle note chaque zone de 1 à 5 à voix haute.","Notez les trois meilleures dans le journal."],"On découvre souvent des zones inattendues : nuque, bas du dos, poignets."],
+ ["Elle vous guide","20 min · exercice",["Elle pose sa main sur la vôtre et vous montre pression, vitesse et zone.","Gardez exactement ce rythme une fois trouvé.","Échangez : qu'est-ce qui était différent de d'habitude ?"],"C'est la leçon la plus efficace : elle est la seule experte de son corps."],
+ ["Avec la bouche","à votre rythme",["Relisez la fiche « Avec la bouche ».","Partez de loin : cuisses, ventre, puis vulve, puis clitoris.","Quand un geste marche, ne changez plus rien."],"La régularité compte plus que la technique."],
+ ["Bilan à deux","10 min · conversation",["Remplissez le journal ensemble.","Qu'est-ce qui a le plus changé depuis le début ?","Choisissez une nouvelle envie commune ou une position à tester."],"Le progrès vient de la régularité des échanges."]]},
+desir:{t:"Raviver le désir",d:"Quand l'envie s'est un peu endormie.",s:[
+ ["Ce qui nous allume","15 min · conversation",["Chacun note trois moments où il a ressenti un désir fort pour l'autre.","Lisez-les à tour de rôle.","Cherchez ce qu'ils ont en commun : un lieu, une tenue, une ambiance ?"],"Le désir se nourrit de souvenirs précis."],
+ ["Enlever les freins","15 min · conversation",["Chacun cite deux choses qui lui coupent l'envie : fatigue, charge mentale, écrans…","Trouvez ensemble une action concrète pour chacune.","Mettez-en une en place dès cette semaine."],"Retirer un frein est souvent plus efficace qu'ajouter un accélérateur."],
+ ["Le désir à distance","une journée",["Envoyez-vous trois messages dans la journée, du plus tendre au plus suggestif.","Rien d'obligatoire le soir : l'idée est de faire monter l'envie.","Le soir, dites-vous quel message a eu le plus d'effet."],"L'anticipation fait partie du plaisir."],
+ ["Le vrai rendez-vous","une soirée",["Organisez une soirée comme au début : tenue, lieu, petite surprise.","Celui ou celle qui organise garde le secret jusqu'au bout.","En rentrant, lancez le mode Soirée."],"La nouveauté réveille le désir, même dans un couple installé."],
+ ["Le baiser de 6 secondes","7 jours",["Chaque jour, un baiser d'au moins 6 secondes, sans raison particulière.","Notez dans le journal ce que ça change.","Faites le bilan à la fin de la semaine."],"Un rituel simple, souvent conseillé par les thérapeutes de couple."]]},
+ralentir:{t:"Ralentir",d:"Retrouver la lenteur et la sensation.",s:[
+ ["Respirer ensemble","10 min · exercice",["Allongés face à face, synchronisez vos respirations.","Posez une main sur le cœur de l'autre.","Aucun autre geste pendant 10 minutes."],"La synchronisation crée une connexion immédiate."],
+ ["Le toucher lent","20 min · exercice",["Caressez deux fois plus lentement que d'habitude.","Celui qui reçoit garde les yeux fermés.","Inversez au bout de 10 minutes."],"La lenteur multiplie les sensations."],
+ ["Sans objectif","30 min · exercice",["Un moment intime où l'orgasme n'est pas le but.","Si l'envie monte, ralentissez encore.","Parlez ensuite de ce que vous avez ressenti."],"Enlever l'objectif enlève la pression."],
+ ["Les cinq sens","20 min · exercice",["Préparez une musique, une huile parfumée, une saveur (fruit, chocolat) et une étoffe douce.","Explorez un sens à la fois.","Chacun dit lequel l'a le plus touché."],"Le plaisir passe par tous les sens, pas seulement le toucher."],
+ ["Garder la lenteur","10 min · conversation",["Notez votre moment dans le journal.","Quel moment de lenteur voulez-vous garder ?","Faites-en un rituel."],"Ce qu'on répète devient naturel."]]},
+fantasmes:{t:"Oser parler de ses fantasmes",d:"Partager ses envies sans gêne ni jugement.",s:[
+ ["Poser le cadre","10 min · conversation",["Règle d'or : un fantasme partagé n'est pas une demande.","Personne ne juge, personne ne se moque.","Chacun peut dire « pas pour moi » sans se justifier."],"Un cadre sûr rend la parole libre."],
+ ["Nos envies","15 min · jeu",["Remplissez « Nos envies », niveau Complice puis Audacieux.","Regardez ensemble vos envies communes.","Choisissez-en une à tester."],"Les envies communes sont un point de départ sans risque."],
+ ["Un fantasme doux","15 min · conversation",["Chacun raconte un fantasme doux : un lieu, une ambiance, un scénario.","L'autre pose des questions curieuses, sans commenter.","Notez dans le journal ce qui vous a plu."],"Commencer doux permet d'aller plus loin ensuite."],
+ ["Écrire à l'autre","20 min · exercice",["Chacun écrit un court texte décrivant une soirée rêvée avec l'autre.","Échangez vos textes.","Gardez-les précieusement."],"L'écrit permet de dire ce qu'on n'ose pas dire à voix haute."],
+ ["Passer à l'acte, ou pas","une soirée",["Choisissez un élément d'un fantasme partagé, réaliste et qui vous tente tous les deux.","Fixez une date.","Faites le bilan après, dans le journal."],"Certains fantasmes sont faits pour être vécus, d'autres pour rester des fantasmes. Les deux sont bien."]]},
+stress:{t:"Après une période de stress",d:"Se retrouver doucement après une période chargée.",s:[
+ ["Faire le point","15 min · conversation",["Chacun dit ce qui l'a épuisé ces derniers temps.","L'autre écoute sans proposer de solution.","Terminez par un long câlin."],"Se sentir compris détend plus que n'importe quel conseil."],
+ ["Toucher sans attente","15 min · exercice",["Massage des épaules et des mains, rien de plus.","Convenez à l'avance que ça s'arrête là.","Puis on inverse."],"Le corps se détend quand il n'y a pas d'attente."],
+ ["Protéger un moment","1 semaine",["Bloquez une soirée par semaine rien que pour vous dans vos agendas.","Téléphones dans une autre pièce.","Ce temps est non négociable."],"Ce qui n'est pas planifié finit par disparaître."],
+ ["Se redécouvrir","20 min · exercice",["Refaites l'exercice « Toucher sans but » du parcours Découverte.","Celui qui reçoit dit « plus », « moins » ou « ailleurs ».","Puis on inverse."],"On repart des bases, sans brûler les étapes."],
+ ["Petit à petit","à votre rythme",["Lancez le mode Soirée, version 30 minutes, niveau Doux.","Aucune pression sur la suite.","Débriefez dans le journal."],"La reprise se fait par petites touches."]]}
+};
+if(!S.pd){S.pd={decouverte:Object.assign({},S.done||{})};}
+if(!S.prog)S.prog="decouverte";
+const pdone=(p,i)=>!!(S.pd[p]&&S.pd[p][i]);
+const pcount=p=>PR[p].s.filter((_,i)=>pdone(p,i)).length;
+let openStep=null;
+function renderL(){
+  const p=S.prog,pr=PR[p],n=pcount(p),next=pr.s.findIndex((_,i)=>!pdone(p,i));
+  $("#progBar").style.width=(n/pr.s.length*100)+"%";
+  $("#progTxt").textContent=n+" / "+pr.s.length+" étapes";
+  $("#progNext").textContent=next<0?"Parcours terminé":"Prochaine : "+(next+1);
+  $("#heroT").textContent=pr.t;$("#heroD").textContent=pr.d;
+  $("#progChips").innerHTML=Object.keys(PR).map(k=>`<button class="chip" data-p="${k}" aria-pressed="${k===p}">${PR[k].t}${pcount(k)?` · ${pcount(k)}/${PR[k].s.length}`:""}</button>`).join("");
+  $$("#progChips .chip").forEach(b=>b.onclick=()=>{S.prog=b.dataset.p;save();$("#lessonSheet").hidden=true;renderL()});
+  $("#progTitle").textContent=pr.t;$("#progDesc").textContent=pr.d;
+  $("#lessons").innerHTML=pr.s.map((l,i)=>`<div class="lesson ${pdone(p,i)?"done":""}" tabindex="0" role="button" data-l="${i}"><div class="n">${pdone(p,i)?"✓":i+1}</div><div><b>${l[0]}</b><span>${l[1]}</span></div><svg class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>`).join("");
+  $$(".lesson").forEach(el=>{const f=()=>openL(+el.dataset.l);el.onclick=f;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
+}
+function openL(i){
+  const p=S.prog,l=PR[p].s[i],sh=$("#lessonSheet");sh.hidden=false;openStep=i;
+  sh.innerHTML=`<div class="row" style="justify-content:space-between"><div class="eyebrow">Étape ${i+1} · ${PR[p].t}</div>${spk()}</div><h2 style="margin:4px 0 6px">${l[0]}</h2><p class="small muted">${l[1]}</p><div data-say><ol>${l[2].map(x=>"<li>"+x+"</li>").join("")}</ol><div class="callout" style="margin-bottom:14px">${l[3]}</div></div><button class="btn" id="lDone">${pdone(p,i)?"Marquer comme à refaire":"Marquer comme faite"}</button>`;
+  sh.classList.remove("pop");void sh.offsetWidth;sh.classList.add("pop");
+  $("#lDone").onclick=()=>{S.pd[p]=S.pd[p]||{};S.pd[p][i]=!S.pd[p][i];save();renderL();openL(i);if(S.pd[p][i])burst($("#lDone"),10)};
+  sh.scrollIntoView({behavior:"smooth",block:"start"});
+}
+renderL();
+
+
+/* ---------- anatomie ---------- */
+const P={gland:["Gland","La seule partie visible, en haut de la vulve, à la jonction des petites lèvres. C'est la zone la plus innervée du corps humain. Souvent trop sensible pour être touchée directement au début."],
+capuchon:["Capuchon","Repli de peau qui recouvre et protège le gland. Le caresser par-dessus est une excellente façon de stimuler indirectement."],
+corps:["Corps","Il remonte du gland vers le pubis sur 2 à 4 cm, puis se coude et se divise en deux. On le sent parfois sous la peau comme un petit cordon souple."],
+piliers:["Piliers","Deux branches d'environ 9 cm qui longent l'os pubien de chaque côté. Stimulés indirectement par des pressions sur les grandes lèvres et le haut des cuisses."],
+bulbes:["Bulbes vestibulaires","Ils encadrent l'entrée du vagin et se gorgent de sang avec l'excitation. Une partie des sensations pendant la pénétration vient d'eux, à travers la paroi vaginale."]};
+const plate=$("#plate"),pc=$("#partChips");
+Object.entries(P).forEach(([k,[n]])=>{const b=document.createElement("button");b.className="chip";b.textContent=n.split(" ")[0];b.dataset.p=k;b.setAttribute("aria-pressed","false");b.onclick=()=>pickP(k);pc.appendChild(b)});
+function pickP(k){plate.classList.add("sel");$$("#plate .part").forEach(g=>g.classList.toggle("on",g.dataset.p===k));$$("#partChips .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.p===k));$("#partInfo").innerHTML="<h3>"+P[k][0]+"</h3><p class='muted' style='margin:0'>"+P[k][1]+"</p>"}
+$$("#plate .part").forEach(g=>{g.onclick=()=>pickP(g.dataset.p);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pickP(g.dataset.p)}}});
+
+/* ---------- zones ---------- */
+const Z=[["Oreilles et lobes",84,44,1,"Souffle chaud, baisers légers, mordillement très doux du lobe."],["Lèvres",110,60,1,"Le baiser reste l'un des préliminaires les plus puissants. Variez lenteur et intensité."],["Cou et nuque",110,84,1,"Baisers le long du cou, du lobe jusqu'à la clavicule. Peau fine, très réactive."],["Poitrine",126,122,1,"Commencer autour, pas directement. Sensibilité très variable selon les personnes et le cycle."],["Intérieur des bras",56,150,2,"Du creux du coude au poignet, du bout des doigts. Souvent négligé."],["Ventre",110,176,2,"Caresses lentes sous le nombril : on se rapproche sans y aller."],["Bas du dos",92,196,2,"Mains à plat, pression ferme. Détend et éveille en même temps."],["Intérieur des cuisses",96,264,1,"Zone clé avant l'oral : baisers qui montent lentement et redescendent."],["Arrière des genoux",86,316,2,"Peau très fine, effet surprenant chez beaucoup de personnes."]];
+$("#zonesG").innerHTML=Z.map((z,i)=>`<g class="zone" data-z="${i}" tabindex="0" role="button" aria-label="${z[0]}"><circle class="halo" cx="${z[1]}" cy="${z[2]}" r="${z[3]===1?13:10}"/><circle class="core" cx="${z[1]}" cy="${z[2]}" r="${z[3]===1?5:3.5}" style="opacity:${z[3]===1?1:.6}"/></g>`).join("");
+const zpop=$("#zpop"),bm=$("#bodymap");
+function zClose(){zpop.hidden=true;$$(".zone").forEach(x=>x.classList.remove("on"))}
+$$(".zone").forEach(g=>{const f=e=>{e&&e.stopPropagation();const z=Z[+g.dataset.z];$$(".zone").forEach(x=>x.classList.toggle("on",x===g));
+  $("#zpT").textContent=z[0];$("#zpP").textContent=z[4];zpop.hidden=false;
+  const br=bm.getBoundingClientRect(),cr=g.querySelector(".core").getBoundingClientRect(),cx=cr.left+cr.width/2-br.left,cy=cr.top-br.top;
+  const w=Math.min(250,br.width-24),left=Math.max(12,Math.min(br.width-w-12,cx-w/2));zpop.style.width=w+"px";zpop.style.left=left+"px";
+  const h=zpop.offsetHeight;let top=cy-h-16,below=false;if(top<8){top=cy+cr.height+16;below=true}
+  zpop.style.top=top+"px";zpop.classList.toggle("below",below);zpop.style.setProperty("--ax",(cx-left)+"px");
+  zpop.classList.remove("show");void zpop.offsetWidth;zpop.classList.add("show")};
+  g.onclick=f;g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f(e)}if(e.key==="Escape")zClose()}});
+$("#zx").onclick=e=>{e.stopPropagation();zClose()};
+bm.addEventListener("click",e=>{if(!e.target.closest(".zone")&&!e.target.closest(".zpop"))zClose()});
+
+
+/* ---------- charts ---------- */
+$("#curveChart").innerHTML=`<svg viewBox="0 0 320 180" role="img" aria-label="L'excitation monte jusqu'à l'orgasme si le geste reste le même, et retombe si on change au moment clé">
+<line class="ax" x1="34" y1="146" x2="306" y2="146"/><line class="ax" x1="34" y1="20" x2="34" y2="146"/>
+<line x1="34" y1="34" x2="306" y2="34" stroke="var(--line)" stroke-dasharray="3 4"/><text class="t" x="304" y="28" text-anchor="end">orgasme</text>
+<path d="M34 138 C100 126 150 96 190 76 C220 62 250 46 274 34 L274 146 L34 146Z" fill="var(--ok)" opacity=".08"/>
+<path d="M34 138 C100 126 150 96 190 76 C220 62 250 46 274 34" stroke="var(--ok)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="274" cy="34" r="5" fill="var(--ok)"/>
+<path d="M190 76 C204 70 210 68 218 78 C232 98 252 110 280 114" stroke="var(--no)" stroke-width="3" fill="none" stroke-dasharray="6 5" stroke-linecap="round"/><circle cx="210" cy="70" r="4.5" fill="var(--surface)" stroke="var(--no)" stroke-width="2"/>
+<text class="t" x="206" y="58" text-anchor="end" style="fill:var(--no);font-weight:600">on change de geste</text>
+<text class="t" x="34" y="164">début</text><text class="t" x="306" y="164" text-anchor="end">temps</text>
+<text class="t" x="24" y="84" transform="rotate(-90 24 84)" text-anchor="middle">excitation</text></svg>
+<p class="small muted" style="margin:6px 6px 2px">Quand elle approche, on a envie d'accélérer ou de varier. L'excitation retombe. <b style="color:var(--fg)">Si ça marche, ne changez rien.</b></p>`;
+$("#phaseChart").innerHTML=`<svg viewBox="0 0 320 170" role="img" aria-label="Les quatre phases : excitation, plateau, orgasme, résolution">
+<line class="ax" x1="20" y1="140" x2="304" y2="140"/>
+<path d="M20 136 C60 132 80 92 110 74 L180 66 C196 62 204 30 214 28 C224 30 230 70 246 96 C266 124 286 134 304 136 L304 140 L20 140Z" fill="var(--accent)" opacity=".12"/>
+<path d="M20 136 C60 132 80 92 110 74 L180 66 C196 62 204 30 214 28 C224 30 230 70 246 96 C266 124 286 134 304 136" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/>
+<g class="t" text-anchor="middle"><text x="64" y="158">excitation</text><text x="146" y="158">plateau</text><text x="214" y="158">orgasme</text><text x="278" y="158">détente</text></g>
+<g stroke="var(--line)" stroke-dasharray="2 3"><line x1="110" y1="74" x2="110" y2="140"/><line x1="182" y1="66" x2="182" y2="140"/><line x1="240" y1="86" x2="240" y2="140"/></g>
+<text class="t" x="146" y="56" text-anchor="middle">le plus long chez elle</text></svg>
+<p class="small muted" style="margin:6px 6px 2px">Chez beaucoup de femmes, la phase d'excitation et de plateau dure plus longtemps. C'est là que tout se joue.</p>`;
+
+/* ---------- positions ---------- */
+/* glyph: a=elle (rose), b=lui (violet). types: face (face à face, un au-dessus), top (elle au-dessus), side (côte à côte), back (même direction), sit (assis), edge (bord) */
+const G={
+ face:`<svg viewBox="0 0 46 46"><rect class="g-b" x="6" y="26" width="34" height="9" rx="4.5"/><rect class="g-a" x="6" y="13" width="34" height="9" rx="4.5"/><circle class="g-b" cx="9" cy="30.5" r="0"/></svg>`,
+ top:`<svg viewBox="0 0 46 46"><rect class="g-b" x="6" y="30" width="34" height="9" rx="4.5"/><rect class="g-a" x="18" y="6" width="10" height="24" rx="5"/></svg>`,
+ side:`<svg viewBox="0 0 46 46"><rect class="g-a" x="6" y="14" width="34" height="8" rx="4" transform="rotate(-6 23 18)"/><rect class="g-b" x="6" y="24" width="34" height="8" rx="4" transform="rotate(-6 23 28)"/></svg>`,
+ back:`<svg viewBox="0 0 46 46"><rect class="g-a" x="6" y="22" width="22" height="9" rx="4.5"/><rect class="g-b" x="24" y="10" width="9" height="26" rx="4.5"/></svg>`,
+ sit:`<svg viewBox="0 0 46 46"><rect class="g-b" x="8" y="30" width="30" height="8" rx="4"/><rect class="g-b" x="10" y="8" width="8" height="24" rx="4" opacity=".85"/><rect class="g-a" x="22" y="8" width="8" height="22" rx="4"/></svg>`,
+ edge:`<svg viewBox="0 0 46 46"><rect x="4" y="22" width="22" height="16" rx="3" fill="var(--line)"/><rect class="g-a" x="6" y="16" width="24" height="8" rx="4"/><rect class="g-b" x="30" y="6" width="9" height="34" rx="4.5"/></svg>`
+};
+const POS=[
+ {n:"Missionnaire",g:"face",tags:["Intime","Débutant"],c:2,i:5,e:2,ctl:"Lui",d:"Elle allongée sur le dos, lui au-dessus, face à face. Le grand classique, idéal pour le regard et les baisers.",t:"Glissez un coussin sous ses hanches et restez bien collés pour que votre pubis frotte le haut de sa vulve."},
+ {n:"Alignement coïtal (CAT)",g:"face",tags:["Clitoris","Intime"],c:5,i:5,e:3,ctl:"Partagé",d:"Variante du missionnaire : lui remonte de quelques centimètres vers sa tête, bassins alignés. Le mouvement devient un bercement d'avant en arrière plutôt qu'un va-et-vient.",t:"Étudiée en sexologie spécifiquement pour stimuler le clitoris pendant la pénétration. Rythme lent et régulier."},
+ {n:"Elle au-dessus, face à face",g:"top",tags:["Clitoris","Elle contrôle"],c:5,i:4,e:3,ctl:"Elle",d:"Lui sur le dos, elle à califourchon face à lui. Elle choisit l'angle, la profondeur et la vitesse.",t:"Encouragez-la à bouger d'avant en arrière plutôt que de haut en bas : le frottement sur le clitoris est maximal."},
+ {n:"Elle au-dessus, penchée",g:"top",tags:["Clitoris","Intime"],c:4,i:5,e:2,ctl:"Elle",d:"Même position, mais elle s'allonge sur lui, poitrine contre poitrine. Plus de contact, moins d'effort pour elle.",t:"Vos mains sont libres pour caresser son dos et ses hanches et l'accompagner dans le rythme."},
+ {n:"La cuillère",g:"side",tags:["Détente","Débutant"],c:4,i:4,e:1,ctl:"Partagé",d:"Allongés sur le côté, lui derrière elle, dans le même sens. Très confortable, idéal le matin ou quand on est fatigués.",t:"Votre main est naturellement placée pour caresser son clitoris pendant toute la durée."},
+ {n:"Face à face sur le côté",g:"side",tags:["Intime","Détente"],c:3,i:5,e:2,ctl:"Partagé",d:"Allongés sur le côté, face à face, jambes entremêlées. Mouvements lents, beaucoup de contact.",t:"Parfait pour se regarder et se parler. Peu de profondeur, beaucoup de tendresse."},
+ {n:"Le lotus",g:"sit",tags:["Intime","Clitoris"],c:4,i:5,e:3,ctl:"Partagé",d:"Lui assis en tailleur, elle assise sur lui face à face, jambes autour de sa taille. Mouvement de bercement.",t:"Position très fusionnelle. Synchronisez vos respirations pour faire monter l'intensité doucement."},
+ {n:"Par derrière",g:"back",tags:["Intensité"],c:2,i:2,e:3,ctl:"Lui",d:"Elle à quatre pattes ou à plat ventre, lui derrière. Sensations différentes, contact visuel limité.",t:"Peut être profonde : allez lentement et demandez. Elle ou vous pouvez ajouter une main sur son clitoris."},
+ {n:"Au bord du lit",g:"edge",tags:["Intensité","Elle détendue"],c:3,i:4,e:3,ctl:"Lui",d:"Elle allongée sur le dos au bord du lit, lui debout ou à genoux face à elle.",t:"Elle n'a aucun effort à faire et vos deux mains sont libres. Bon angle pour stimuler le clitoris avec le pouce."}
+];
+const FILT=["Toutes","Favoris","Clitoris","Intime","Elle contrôle","Détente","Débutant","Intensité"];
+let pf="Toutes";
+$("#posFilters").innerHTML=FILT.map(f=>`<button class="chip" data-f="${f}" aria-pressed="${f===pf}">${f}</button>`).join("");
+$$("#posFilters .chip").forEach(b=>b.onclick=()=>{pf=b.dataset.f;$$("#posFilters .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderPos()});
+const meter=(lab,v,cls="")=>`<div class="meter ${cls}"><span>${lab}</span><div class="seg5">${[1,2,3,4,5].map(k=>`<i class="${k<=v?"f":""}"></i>`).join("")}</div></div>`;
+function renderPos(){
+  const list=POS.map((p,i)=>({p,i})).filter(({p,i})=>pf==="Toutes"||(pf==="Favoris"?S.fav[i]:p.tags.includes(pf)));
+  $("#posList").innerHTML=list.length?list.map(({p,i})=>`<article class="pos">
+   <div class="pos-head"><div class="glyph" aria-hidden="true">${G[p.g]}</div><div><h3>${p.n}</h3><small>Contrôle du rythme : ${p.ctl}</small></div>
+   <button class="fav" data-i="${i}" aria-pressed="${!!S.fav[i]}" aria-label="Ajouter aux favoris"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></button></div>
+   <div class="meters">${meter("Stimulation du clitoris",p.c)}${meter("Intimité",p.i)}${meter("Effort physique",p.e,"p")}</div>
+   <p>${p.d}</p><div class="tip"><b>Le conseil :</b> ${p.t}</div>
+   <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div></article>`).join("")
+   :`<div class="card"><h3>Aucun favori pour l'instant</h3><p class="muted" style="margin:0">Touchez le cœur sur une position pour la retrouver ici.</p></div>`;
+  $$(".fav").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;S.fav[i]=!S.fav[i];save();renderPos()});
+}
+renderPos();
+
+/* ---------- envies ---------- */
+const D=[
+ [1,"Un long massage avec de l'huile, sans attente de la suite"],[1,"Se déshabiller lentement l'un l'autre"],[1,"Une soirée entière sans téléphone, rien que nous"],[1,"Prendre un bain ou une douche ensemble"],[1,"S'embrasser longtemps, sans aller plus loin"],[1,"Faire l'amour le matin"],
+ [2,"Qu'elle me guide avec sa main"],[2,"Se dire à voix haute ce qu'on aime pendant"],[2,"Utiliser du lubrifiant"],[2,"Essayer une nouvelle position du guide"],[2,"Se bander les yeux pour tout ressentir"],[2,"S'envoyer des messages coquins dans la journée"],
+ [3,"Choisir ensemble un petit sextoy"],[3,"Faire l'amour ailleurs que dans la chambre"],[3,"Se raconter un fantasme"],[3,"Un jeu de rôle léger"],[3,"Que l'un de nous dirige entièrement le moment"],[3,"Se regarder dans un miroir"]
+];
+const LV={1:"Doux",2:"Complice",3:"Audacieux"};
+let who="elle",lvl=1;
+$("#lvlChips").innerHTML=[1,2,3].map(l=>`<button class="chip" data-l="${l}" aria-pressed="${l===lvl}">${LV[l]}</button>`).join("");
+$$("#lvlChips .chip").forEach(b=>b.onclick=()=>{lvl=+b.dataset.l;$$("#lvlChips .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderDeck()});
+function nextIdx(){return D.findIndex((d,i)=>d[0]===lvl&&S.votes[who][i]===undefined)}
+function renderDeck(){
+  const i=nextIdx(),tot=D.filter(d=>d[0]===lvl).length,done=D.filter((d,k)=>d[0]===lvl&&S.votes[who][k]!==undefined).length;
+  if(i<0){$("#deck").innerHTML=`<div class="dcard lv${lvl}"><div class="lvl">${LV[lvl]} · terminé</div><div class="txt">${who==="elle"?"Stéphanie":"Antoine"} a répondu à tout ce niveau.</div><div class="cnt">${who==="elle"?"Passez le téléphone à Antoine, ou":"Passez à"} un autre niveau, puis ouvrez « En commun ».</div></div>`;$("#voteBtns").hidden=true;return}
+  $("#voteBtns").hidden=false;
+  $("#deck").innerHTML=`<div class="dcard lv${lvl}" id="dc"><span class="stamp st-oui">Oui</span><span class="stamp st-non">Non</span><span class="stamp st-peut">Peut-être</span><div class="lvl">${LV[lvl]} · ${who==="elle"?"Stéphanie répond":"Antoine répond"}</div><div class="txt">${esc(D[i][1])}</div><div class="cnt">${done+1} / ${tot} · glissez à droite pour oui, à gauche pour non, vers le haut pour peut-être</div></div>`;
+  const c=$("#dc");if(!matchMedia("(prefers-reduced-motion: reduce)").matches){c.classList.add("pop")}
+  swipeable(c,{up:true,stamps:true,onRight:()=>vote("oui",true),onLeft:()=>vote("non",true),onUp:()=>vote("peut",true)});
+}
+function vote(v,swiped){const i=nextIdx();if(i<0)return;S.votes[who][i]=v;save();
+  const c=$("#dc");const m=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(c&&!m&&!swiped){c.classList.add(v==="oui"?"out-r":v==="non"?"out-l":"out-u");setTimeout(renderDeck,300)}else renderDeck()}
+$$("#voteBtns button").forEach(b=>b.onclick=()=>vote(b.dataset.v,false));
+$$(".who button").forEach(b=>b.onclick=()=>{who=b.dataset.who;$$(".who button").forEach(x=>x.setAttribute("aria-pressed",x===b));const m=who==="match";$("#deckZone").hidden=m;$("#matchZone").hidden=!m;m?renderMatch():renderDeck()});
+function renderMatch(){
+  const e=S.votes.elle,l=S.votes.lui;
+  const yes=D.map((d,i)=>i).filter(i=>e[i]==="oui"&&l[i]==="oui");
+  const may=D.map((d,i)=>i).filter(i=>(e[i]==="oui"&&l[i]==="peut")||(e[i]==="peut"&&l[i]==="oui"));
+  const both=D.map((d,i)=>i).filter(i=>e[i]!==undefined&&l[i]!==undefined).length;
+  $("#matchStat").innerHTML=`<div><b>${yes.length}</b><span>envies communes</span></div><div><b>${may.length}</b><span>à discuter</span></div><div><b>${both}</b><span>/ ${D.length} répondues à deux</span></div>`;
+  const li=(arr,col)=>arr.length?arr.map(i=>`<div class="mi"><i style="background:${col}"></i><div><div>${esc(D[i][1])}</div><div class="small muted">${LV[D[i][0]]}</div></div></div>`).join(""):`<p class="small muted">Rien pour l'instant. Répondez chacun de votre côté.</p>`;
+  $("#matchYes").innerHTML=li(yes,"var(--ok)");$("#matchMaybe").innerHTML=li(may,"var(--mid)");
+}
+$("#resetDeck").onclick=()=>$("#resetConfirm").hidden=false;
+$("#resetNo").onclick=()=>$("#resetConfirm").hidden=true;
+$("#resetYes").onclick=()=>{S.votes={elle:{},lui:{}};save();$("#resetConfirm").hidden=true;renderMatch()};
+renderDeck();
+
+/* ---------- journal ---------- */
+const J={cx:0,pe:0,pl:0};
+$$(".rate").forEach(r=>{r.innerHTML=[1,2,3,4,5].map(n=>`<button aria-pressed="false" data-n="${n}">${n}</button>`).join("");r.querySelectorAll("button").forEach(b=>b.onclick=()=>{J[r.dataset.k]=+b.dataset.n;r.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))})});
+$("#jSave").onclick=()=>{
+  if(!J.cx||!J.pe||!J.pl){$("#jMsg").textContent="Notez les trois critères pour enregistrer.";return}
+  S.journal.unshift({d:Date.now(),cx:J.cx,pe:J.pe,pl:J.pl,k:$("#jKeep").value.trim(),t:$("#jTry").value.trim()});save();
+  J.cx=J.pe=J.pl=0;$$(".rate button").forEach(b=>b.setAttribute("aria-pressed","false"));$("#jKeep").value="";$("#jTry").value="";
+  $("#jMsg").textContent="Enregistré.";renderJ();
+};
+function renderJ(){
+  const j=S.journal;
+  $("#jList").innerHTML=j.length?j.slice(0,20).map(e=>`<div class="entry"><div class="d">${new Date(e.d).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})} · connexion ${e.cx}/5 · Stéphanie ${e.pe}/5 · Antoine ${e.pl}/5</div>${e.k?`<div class="small"><b>On garde :</b> ${esc(e.k)}</div>`:""}${e.t?`<div class="small"><b>On essaie :</b> ${esc(e.t)}</div>`:""}</div>`).join(""):`<div class="entry"><p class="muted" style="margin:0">Votre premier moment noté apparaîtra ici.</p></div>`;
+  const pts=j.slice(0,10).reverse();
+  if(pts.length<2){$("#spark").innerHTML=`<p class="small muted" style="margin:0">La courbe apparaît à partir de deux moments notés. Elle suit le plaisir moyen et la connexion.</p>`;return}
+  const W=300,H=70,x=k=>12+k*(W-24)/(pts.length-1),y=v=>H-10-(v-1)*(H-20)/4;
+  const line=f=>pts.map((p,k)=>(k?"L":"M")+x(k).toFixed(1)+" "+y(f(p)).toFixed(1)).join(" ");
+  const avg=p=>(p.pe+p.pl)/2;
+  $("#spark").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution du plaisir moyen et de la connexion"><line x1="12" y1="${y(3)}" x2="${W-12}" y2="${y(3)}" stroke="var(--line)" stroke-dasharray="3 4"/><path d="${line(avg)} L${x(pts.length-1)} ${H} L12 ${H}Z" fill="var(--accent)" opacity=".1"/><path d="${line(avg)}" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="${line(p=>p.cx)}" stroke="var(--plum-2)" stroke-width="2" fill="none" stroke-dasharray="4 3"/><circle cx="${x(pts.length-1)}" cy="${y(avg(pts.at(-1)))}" r="4" fill="var(--accent)"/></svg><div class="legend"><span><i style="background:var(--accent)"></i>plaisir moyen</span><span><i style="background:var(--plum-2)"></i>connexion</span></div>`;
+}
+renderJ();
+
+/* ---------- jeu ---------- */
+const PL={s:{n:"Stéphanie",i:"S",c:"av-s",f:1},a:{n:"Antoine",i:"A",c:"av-a",f:0}};
+const other=p=>p==="s"?"a":"s";
+const av=p=>`<i class="${PL[p].c}">${PL[p].i}</i>${PL[p].n}`;
+const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const dur=s=>s<60?s+" s":(s%60?Math.floor(s/60)+" min 30":(s/60)+" min");
+const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* tokens : {A} joueur, {B} partenaire, {e}/{eB} accord féminin de A/B, {lB} le/la pour B */
+const elide=h=>h.replace(/\bde <em>Antoine/g,"d'<em>Antoine").replace(/\bque <em>Antoine/g,"qu'<em>Antoine").replace(/qu'<em>Stéphanie/g,"que <em>Stéphanie");
+function T(t,p){return elide(T0(t,p))}
+function T0(t,p){const q=other(p);return t.replaceAll("{A}",`<em>${PL[p].n}</em>`).replaceAll("{B}",`<em>${PL[q].n}</em>`).replaceAll("{eB}",PL[q].f?"e":"").replaceAll("{e}",PL[p].f?"e":"").replaceAll("{lB}",PL[q].f?"la":"le")}
+const GLV={0:"Aléatoire",1:"Doux",2:"Complice",3:"Audacieux"};
+const GRAD={1:"linear-gradient(150deg,#6E4FA8,#C04A84)",2:"linear-gradient(150deg,#4E2E7A,#A8215F)",3:"linear-gradient(150deg,#2B1A47,#7E1846)"};
+
+/* ----- effets ----- */
+function burst(el,n=10){if(RM()||!el)return;const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<n;i++){const h=document.createElement("span");h.className="heart";h.textContent="♥";
+    const a=Math.random()*Math.PI*2,d=50+Math.random()*70;h.style.left=cx+"px";h.style.top=cy+"px";h.style.setProperty("--dx",Math.cos(a)*d+"px");h.style.setProperty("--dy",Math.sin(a)*d-30+"px");h.style.fontSize=(12+Math.random()*12)+"px";h.style.animationDelay=(Math.random()*.12)+"s";
+    document.body.appendChild(h);setTimeout(()=>h.remove(),1300)}}
+function plusOne(el){if(RM()||!el)return;const r=el.getBoundingClientRect(),s=document.createElement("span");s.className="plus";s.textContent="+1";s.style.left=(r.left+r.width/2)+"px";s.style.top=r.top+"px";document.body.appendChild(s);setTimeout(()=>s.remove(),1000)}
+
+/* ----- scores par jeu ----- */
+let SC={};try{const g=JSON.parse(localStorage.getItem("adeux-scores"));if(g&&typeof g==="object")SC=g}catch(e){}
+let scSave=()=>{try{localStorage.setItem("adeux-scores",JSON.stringify(SC))}catch(e){}};
+const sc=g=>SC[g]||(SC[g]={s:0,a:0,n:0,acc:0});
+const POINTS=["cartes","av","roue","des","quiz"];
+let curGame=null;
+function point(p){const s=sc(curGame);s[p]++;scSave();renderPScore(p);renderTiles()}
+function renderPScore(bumped){const box=$("#pScore");if(!curGame||!POINTS.includes(curGame)){box.hidden=true;return}box.hidden=false;const s=sc(curGame);
+  box.innerHTML=["s","a"].map(p=>`<div data-p="${p}"><span class="avatar">${av(p)}</span><b class="${bumped===p?"bump":""}">${s[p]}</b></div>`).join("")+`<button class="chip" id="scReset">Remettre à zéro</button>`;
+  if(bumped)plusOne(box.querySelector(`[data-p="${bumped}"] b`));
+  $("#scReset").onclick=()=>{SC[curGame]={s:0,a:0,n:0,acc:0};scSave();renderPScore();renderTiles()}}
+function renderTiles(){$$(".gsc").forEach(el=>{const g=el.dataset.g,s=sc(g);
+  el.textContent=POINTS.includes(g)?(s.s+s.a?`Stéphanie ${s.s} · Antoine ${s.a}`:"Pas encore de points"):g==="tp"?(s.n?`${s.acc} accord${s.acc>1?"s":""} sur ${s.n}`:"Avez-vous les mêmes goûts ?"):g==="jamais"?(s.n?`${s.n} carte${s.n>1?"s":""} jouée${s.n>1?"s":""}`:"Avec un gage à la clé"):(PERSO.length?`${PERSO.length} carte${PERSO.length>1?"s":""} créée${PERSO.length>1?"s":""}`:"Écrivez vos défis")})}
+
+/* ----- chrono ----- */
+let gtimer=null;const stopT=()=>{if(gtimer){clearInterval(gtimer);gtimer=null}};
+function timerHTML(sec,label){return sec?`<div class="timer"><svg class="ring" viewBox="0 0 46 46"><circle class="bg" cx="23" cy="23" r="19"/><circle class="fg" cx="23" cy="23" r="19" stroke-dasharray="119.4" stroke-dashoffset="0"/></svg><b>${fmt(sec)}</b><button type="button">${label||"Lancer le chrono"}</button></div>`:`<div class="timer"><span class="small" style="opacity:.85">Prenez le temps qu'il faut.</span></div>`}
+function bindTimer(card,sec){if(!sec)return;const b=card.querySelector(".timer button"),tt=card.querySelector(".timer b"),tr=card.querySelector(".timer .fg");
+  const run=e=>{e&&e.stopPropagation();stopT();let left=sec,paused=false;b.textContent="Pause";b.onclick=ev=>{ev.stopPropagation();paused=!paused;b.textContent=paused?"Reprendre":"Pause"};card.classList.add("running");
+    gtimer=setInterval(()=>{if(paused)return;left--;tt.textContent=fmt(Math.max(left,0));tr.style.strokeDashoffset=(119.4*(1-left/sec)).toFixed(1);if(left<=0){stopT();card.classList.remove("running");tt.textContent="Fini";burst(tt,8);b.textContent="Encore ?";b.onclick=run}},1000)};
+  b.onclick=run}
+function flipTo(card,html,after){if(RM()){card.innerHTML=html;after&&after();return}card.classList.add("flip");setTimeout(()=>{card.innerHTML=html;after&&after();card.classList.remove("flip")},220)}
+
+/* ----- navigation ----- */
+const GN={cartes:["Cartes","Plus de 100 défis. Touchez le paquet pour tirer une carte."],av:["Action ou vérité","Le joueur choisit : une question intime ou un défi."],roue:["La roue","Le joueur tourne la roue et relève le défi."],des:["Les dés","Lancez les trois dés, puis lancez le chrono pour commencer l'action."],tp:["Tu préfères","Chacun répond en secret, puis on compare."],quiz:["Qui me connaît ?","L'un répond en secret, l'autre devine. Une bonne réponse rapporte un point."],jamais:["Je n'ai jamais","Une affirmation, deux réponses, un gage."],perso:["Mes cartes","Vos propres défis, ajoutés au jeu de cartes."]};
+function openGame(g){
+  stopT();curGame=g;$("#gHub").hidden=!!g;$("#gBackRow").hidden=!g;
+  $$(".gpanel").forEach(p=>p.hidden=p.id!=="g-"+g);
+  $("#gTitle").textContent=g?GN[g][0]:"Les jeux";
+  $("#gLead").textContent=g?GN[g][1]:"Choisissez un jeu. Une seule règle partout : on peut toujours passer, sans se justifier.";
+  $("#gRulesH").hidden=$("#gRules").hidden=g==="perso";
+  renderPScore();
+  if(g==="perso")renderPerso();if(g==="tp")tpStart();if(g==="quiz")qzStart();if(g==="cartes")cIdle(false);if(g==="jamais")jmDraw();
+  if(!g)renderTiles();
+  window.scrollTo(0,0);
+}
+$$(".gtile").forEach(b=>b.onclick=()=>openGame(b.dataset.game));
+$("#gBack").onclick=()=>openGame(null);
+addEventListener("hashchange",()=>{if(location.hash!=="#jeu")stopT()});
+document.querySelector('nav.tabs a[data-t="jeu"]').addEventListener("click",()=>{if(location.hash==="#jeu"&&curGame)openGame(null)});
+
+const glvl={cartes:1,av:1};
+$$(".lvlc").forEach(c=>{const k=c.dataset.for,ls=k==="cartes"?[0,1,2,3]:[1,2,3];c.innerHTML=ls.map(l=>`<button class="chip" data-l="${l}" aria-pressed="${l===glvl[k]}">${GLV[l]}</button>`).join("");
+  c.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{glvl[k]=+b.dataset.l;c.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));k==="cartes"?cIdle(true):avReset()})});
+const bag={};function fromBag(key,n){if(!bag[key]||!bag[key].length||bag[key].max!==n){bag[key]=[...Array(n).keys()].sort(()=>Math.random()-.5);bag[key].max=n}return bag[key].pop()}
+
+/* ===== CARTES (108 cartes) ===== */
+const GC={
+1:[["{A} embrasse lentement le cou de {B}.",60],["{A} masse les épaules et la nuque de {B}.",120],["{A} dit à {B} les trois choses qui l'attirent le plus chez {B}.",0],["{A} caresse le dos de {B} du bout des doigts, très lentement.",90],["{A} embrasse {B} comme lors de votre premier baiser.",30],["{A} raconte à {B} un souvenir à deux qui l'a marqué{e}.",0],["{A} masse les mains de {B}, doigt par doigt.",60],["{A} embrasse {B} partout sur le visage, sauf sur la bouche.",45],["{A} masse les pieds de {B}.",90],["{A} et {B} se regardent dans les yeux sans parler ni rire.",60],["{A} raconte le moment où {B} lui a paru irrésistible pour la première fois.",0],["{A} dessine des lettres du bout du doigt dans le dos de {B}, qui doit deviner le mot.",0],["{A} fait un câlin à {B} en synchronisant vos respirations.",60],["{A} passe lentement la main dans les cheveux de {B}.",60],["{A} embrasse le creux du poignet de {B}, puis remonte jusqu'au coude.",0],["{A} murmure un compliment à l'oreille de {B}.",0],["{A} choisit une chanson, et vous dansez un slow.",0],["{A} embrasse l'épaule de {B} en écartant doucement son vêtement.",0],["{A} masse le cuir chevelu de {B}.",60],["{A} dit à {B} ce qui lui manque le plus quand vous êtes loin.",0],["{A} souffle doucement dans le cou de {B}.",20],["{A} embrasse {B} le plus lentement possible.",30],["{A} caresse le visage de {B}, les yeux fermés, comme pour le mémoriser.",45],["{A} propose à {B} une idée de soirée en amoureux.",0],["{A} embrasse la nuque de {B}.",30],["{A} masse le dos de {B} par-dessus les vêtements.",120],["{A} serre {B} dans ses bras et lui dit pourquoi {A} l'aime.",0],["{A} embrasse chaque doigt de {B}.",0],["{A} effleure les lèvres de {B} sans l'embrasser.",20],["{A} chuchote à {B} le surnom le plus doux qui lui vient.",0],["{A} masse les tempes de {B} en petits cercles.",45],["{A} refait le premier regard qu'il y a eu entre vous.",0],["{A} embrasse le front de {B}, puis ses paupières.",0],["{A} caresse les bras de {B}, des épaules jusqu'aux mains.",60],["{A} raconte le moment de la journée où {B} lui a manqué.",0],["{A} et {B} s'embrassent sans utiliser les mains.",30]],
+2:[["{A} retire un vêtement de {B}, le plus lentement possible.",0],["{B} ferme les yeux. {A} l'embrasse à trois endroits surprises.",0],["{B} guide la main de {A} : vitesse, pression, endroit. {A} suit sans parler.",120],["{A} masse le dos et les jambes de {B} avec de l'huile.",180],["{A} dit à {B} ce qui lui fait le plus envie ce soir.",0],["{A} embrasse le ventre de {B} et remonte lentement.",60],["{A} effleure l'intérieur des bras puis des cuisses de {B}.",90],["{B} choisit une zone du corps. {A} s'en occupe avec les lèvres uniquement.",60],["{A} enlève un vêtement, au choix de {B}.",0],["{A} embrasse {B} du lobe de l'oreille jusqu'à l'épaule.",45],["{A} décrit à voix basse la tenue de {B} qui lui fait le plus d'effet.",0],["{A} masse les cuisses de {B}, de l'extérieur vers l'intérieur.",90],["{B} s'allonge sur le ventre. {A} couvre son dos de baisers.",90],["{A} embrasse {B} en {lB} plaquant doucement contre le mur.",30],["{A} fait glisser un glaçon le long du dos de {B}.",0],["{A} raconte à {B} ce qu'{B} a fait de mieux lors de votre dernière fois.",0],["{A} mordille doucement l'oreille de {B}.",20],["{B} reste immobile. {A} l'embrasse partout sauf sur la bouche.",60],["{A} caresse {B} sous ses vêtements, sans les enlever.",60],["{A} fait glisser un vêtement de {B} en l'embrassant à chaque étape.",0],["{A} masse le bas du dos de {B}, mains bien à plat.",90],["{A} embrasse les hanches de {B}.",45],["{A} trace un mot du bout de la langue sur l'épaule de {B}, qui doit deviner.",0],["{A} murmure à {B} ce que {A} préfère faire à deux.",0],["{B} a les yeux bandés. {A} l'embrasse.",30],["{A} masse les épaules de {B} à l'huile, haut retiré si {B} le souhaite.",120],["{A} et {B} dansent collés-serrés sur la musique choisie par {B}.",0],["{A} embrasse l'intérieur du poignet, du coude, puis du genou de {B}.",0],["{A} chuchote à {B} l'endroit de son corps qu'{A} préfère.",0],["{A} effleure {B} avec un foulard, une plume ou le bout des doigts.",90],["{A} enlève les chaussettes de {B} et lui masse les pieds.",60],["{A} embrasse le dos de {B} en descendant le long de la colonne.",60],["{B} dit seulement « plus », « moins » ou « ailleurs ». {A} caresse selon ses consignes.",120],["{A} fait monter la tension avec des baisers dans le cou, puis s'arrête net.",0],["{A} embrasse {B} en lui tenant doucement les poignets.",30],["{A} et {B} se déshabillent mutuellement, une pièce chacun.",0]],
+3:[["Pendant ce temps, {B} n'a pas le droit de toucher : {A} décide de tout.",180],["{B} choisit une position du guide pour la suite.",0],["{A} raconte un fantasme à {B}. {B} écoute sans juger.",0],["{A} embrasse l'intérieur des cuisses de {B}, sans aller plus loin.",60],["{B} a les yeux bandés. {A} alterne caresses lentes et baisers.",180],["{A} demande à {B} de lui montrer comment {B} aime être touché{eB}, et regarde.",120],["{B} donne trois consignes à {A}, qui doit les suivre à la lettre.",0],["{A} retire le dernier vêtement de {B}.",0],["{A} embrasse tout le corps de {B}, de la tête aux pieds.",180],["{A} décrit à l'oreille de {B} ce qui va se passer dans les prochaines minutes.",0],["{B} s'allonge. {A} utilise sa bouche partout, sauf entre les jambes.",120],["{A} masse tout le corps de {B} avec de l'huile chaude.",180],["{A} caresse {B} devant un miroir, et vous vous regardez.",90],["{B} choisit la pièce de la maison pour la suite.",0],["{A} se déshabille lentement devant {B}, qui n'a pas le droit de toucher.",60],["{A} fait monter l'excitation de {B} jusqu'à ce que {B} dise « stop », puis recommence.",180],["{A} embrasse {B} au plus près de ses zones intimes, sans jamais y toucher.",90],["{B} met les mains au-dessus de la tête et ne les bouge plus. {A} prend les commandes.",120],["{A} confie à {B} une envie jamais avouée.",0],["{A} guide la main de {B} sur son propre corps.",90],["{A} choisit un accessoire de la maison (foulard, plume, glaçon) et l'utilise sur {B}.",120],["Pour la suite, pas de pénétration : seulement les mains et la bouche.",0],["{B} décide du rythme pour toute la fin de la soirée.",0],["{A} murmure à {B} trois mots qui lui donnent envie.",0],["La suite se passe ailleurs que dans la chambre.",0],["{A} caresse {B} très lentement, et n'accélère que quand {B} le demande.",120],["{A} dit à {B}, sans détour, ce qui l'excite le plus chez {B}.",0],["{A} caresse {B} sans jamais toucher deux fois le même endroit.",90],["{A} fait un strip-tease improvisé sur la chanson choisie par {B}.",0],["{A} et {B} prennent une douche ensemble et se lavent mutuellement.",0],["{A} chuchote le nom d'une position du guide. {B} répond oui ou non.",0],["{A} embrasse {B} en remontant lentement des chevilles jusqu'aux hanches.",120],["{B} chuchote où {B} veut être touché{eB}. {A} obéit.",90],["{A} reste immobile et laisse {B} faire tout ce qui lui plaît.",120],["Trois minutes de caresses obligatoires avant d'avoir le droit d'aller plus loin.",180],["{A} raconte son fantasme le plus doux, puis le plus fou.",0]]
+};
+let PERSO=[];try{const p=JSON.parse(localStorage.getItem("adeux-perso"));if(Array.isArray(p))PERSO=p}catch(e){}
+let savePerso=()=>{try{localStorage.setItem("adeux-perso",JSON.stringify(PERSO))}catch(e){}};
+const deck=l=>GC[l].concat(PERSO.filter(c=>c.l===l).map(c=>[esc(c.t),c.sec]));
+const total=()=>[1,2,3].reduce((n,l)=>n+deck(l).length,0);
+let cp="s",cState="idle";
+const cCard=$("#cCard");
+function cInfo(){$("#cTurn").innerHTML=av(cp);$("#cInfo").textContent=glvl.cartes?`${GLV[glvl.cartes]} · ${deck(glvl.cartes).length} cartes`:`Aléatoire · ${total()} cartes`}
+function cIdle(anim){stopT();cState="idle";cInfo();$("#cAct").hidden=true;cCard.classList.remove("open","toss");$("#cHint").textContent=`${PL[cp].n}, touchez pour tirer une carte`;
+  if(anim&&!RM()){cCard.classList.remove("deal");void cCard.offsetWidth;cCard.classList.add("deal")}}
+function cDraw(){if(cState!=="idle")return;const l=glvl.cartes||1+(Math.random()*3|0),d=deck(l),[t,sec]=d[fromBag("c"+l,d.length)];
+  const f=$("#cFront");f.style.background=GRAD[l];
+  f.innerHTML=`<div class="top"><span>Au tour de ${PL[cp].n} · ${GLV[l]}</span>${spk()}</div><div class="txt">${T(t,cp)}</div>${timerHTML(sec)}`;
+  bindTimer(f,sec);cState="open";cCard.classList.add("open");setTimeout(()=>{$("#cAct").hidden=false},RM()?0:450)}
+cCard.onclick=()=>{if(cCard._dragged)return;cDraw()};
+swipeable(cCard,{enabled:()=>cState==="open",onRight:()=>cNext(true,true),onLeft:()=>cNext(false,true)});cCard.onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target===cCard){e.preventDefault();cDraw()}};
+function cNext(scored,swiped){if(cState!=="open")return;cState="busy";stopT();if(TTS)TTS.stop();if(scored){point(cp);burst(cCard,12)}
+  $("#cAct").hidden=true;if(RM()||swiped){cp=other(cp);cCard.classList.remove("open");cIdle(!RM());return}cCard.classList.add("toss");setTimeout(()=>{cp=other(cp);cCard.classList.remove("open");cIdle(true)},420)}
+$("#cDone").onclick=()=>cNext(true);$("#cPass").onclick=()=>cNext(false);
+
+/* ===== ACTION OU VÉRITÉ ===== */
+const AV={
+v:{1:["Qu'as-tu ressenti la première fois que tu as vu {B} ?","Qu'est-ce que {B} fait qui te fait craquer sans le savoir ?","Quel est ton meilleur souvenir de vacances à deux ?","À quel moment de la journée penses-tu le plus à {B} ?","Quel petit geste de {B} te rend heureux{e} ?","Quelle est la plus belle chose que {B} t'ait dite ?","Qu'est-ce qui t'a fait tomber amoureux{e} ?"],
+   2:["Quelle tenue de {B} te plaît le plus ?","Où aimes-tu le plus être embrassé{e} ?","Quand as-tu eu le plus envie de {B} récemment ?","Quelle caresse aimerais-tu recevoir plus souvent ?","Qu'est-ce qui te met le plus vite dans l'ambiance ?","Quel est ton souvenir le plus sensuel avec {B} ?","Qu'est-ce que tu n'oses pas demander à {B} ?"],
+   3:["Quel fantasme n'as-tu jamais osé dire à {B} ?","Quel endroit insolite te tenterait pour faire l'amour ?","Qu'est-ce qui te fait le plus d'effet dans la façon dont {B} te touche ?","Quel moment intime à deux aimerais-tu revivre ?","Qu'aimerais-tu que {B} ose plus souvent ?","Quelle position préfères-tu, et pourquoi ?","Qu'est-ce qui te fait perdre la tête ?"]},
+a:{1:[["Fais un compliment à {B} en {lB} regardant dans les yeux.",20],["Masse les pieds de {B}.",60],["Embrasse {B} sur le front, le nez, puis les lèvres.",0],["Danse un slow avec {B} sur la chanson de son choix.",0],["Fais un câlin à {B} sans rien dire.",30],["Embrasse la main de {B} comme au premier rendez-vous.",0]],
+   2:[["Enlève un vêtement de ton choix.",0],["Embrasse le cou de {B}.",30],["Murmure à {B} ce que tu as envie de faire ce soir.",0],["Laisse {B} t'embrasser où {B} le souhaite.",0],["Masse le bas du dos de {B}.",60],["Embrasse {B} en {lB} tenant par la taille.",30]],
+   3:[["Enlève un vêtement à {B}, sans les mains.",0],["Bande les yeux de {B} jusqu'au prochain tour.",0],["Montre à {B}, sur ton propre corps, comment tu aimes être caressé{e}.",60],["Laisse {B} décider de tout pendant le prochain tour.",0],["Embrasse {B} du cou jusqu'au nombril, très lentement.",60],["Chuchote à {B} ton fantasme du moment.",0]]}
+};
+let avp="s",avk=null;
+function avReset(){stopT();avk=null;$("#avTurn").innerHTML=av(avp);const c=$("#avCard");c.style.background=GRAD[glvl.av];
+  flipTo(c,`<div class="top"><span>Au tour de ${PL[avp].n}</span><span>${GLV[glvl.av]}</span></div><div class="txt">${PL[avp].n}, action ou vérité ?</div><div class="timer"><span class="small" style="opacity:.85">À vous de choisir.</span></div>`);
+  $("#avPick").hidden=false;$("#avNext").hidden=true}
+$$("#avPick button").forEach(b=>b.onclick=()=>{avk=b.dataset.k;const l=glvl.av,list=AV[avk][l],i=fromBag("av"+avk+l,list.length);
+  const item=avk==="v"?[list[i],0]:list[i],c=$("#avCard");
+  flipTo(c,`<div class="top"><span>${avk==="v"?"Vérité":"Action"} · ${PL[avp].n} · ${GLV[l]}</span>${spk()}</div><div class="txt">${T(item[0],avp)}</div>${avk==="v"?`<div class="timer"><span class="small" style="opacity:.85">${PL[other(avp)].n} écoute, sans juger.</span></div>`:timerHTML(item[1])}`,()=>bindTimer(c,item[1]));
+  $("#avPick").hidden=true;$("#avNext").hidden=false});
+$("#avDone").onclick=()=>{point(avp);burst($("#avCard"));avp=other(avp);avReset()};$("#avPass").onclick=()=>{avp=other(avp);avReset()};
+
+/* ===== ROUE ===== */
+const WH=[["Baiser","{A} embrasse {B} pendant 30 secondes, à l'endroit choisi par {B}."],["Massage","{A} masse {B} pendant 1 minute, zone au choix de {B}."],["Vêtement","{A} enlève un vêtement, au choix de {B}."],["Vérité","VERITE"],["Chuchoter","{A} chuchote à {B} ce qui lui donne envie ce soir."],["Yeux fermés","{B} ferme les yeux. {A} l'embrasse à trois endroits surprises."],["Compliment","{A} fait trois compliments à {B}, en {lB} regardant dans les yeux."],["Joker","{A} invente librement un défi pour {B}."]];
+const WC=["#C04A84","#6E4FA8","#A8215F","#C9963F","#7B5BB0","#7E1846","#D9487F","#4E2E7A"];
+(function(){const cx=150,cy=150,r=140;let s="";WH.forEach((w,i)=>{const a0=(i*45-90)*Math.PI/180,a1=((i+1)*45-90)*Math.PI/180;
+  s+=`<path d="M${cx} ${cy} L${(cx+r*Math.cos(a0)).toFixed(1)} ${(cy+r*Math.sin(a0)).toFixed(1)} A${r} ${r} 0 0 1 ${(cx+r*Math.cos(a1)).toFixed(1)} ${(cy+r*Math.sin(a1)).toFixed(1)}Z" fill="${WC[i]}" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>`;
+  const am=i*45+22.5;s+=`<text x="${cx}" y="${cy-r+30}" transform="rotate(${am} ${cx} ${cy})" text-anchor="middle" fill="#fff" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="600" font-size="13">${w[0]}</text>`});
+  for(let i=0;i<16;i++){const a=(i*22.5-90)*Math.PI/180;s+=`<circle cx="${(cx+(r-6)*Math.cos(a)).toFixed(1)}" cy="${(cy+(r-6)*Math.sin(a)).toFixed(1)}" r="2.6" fill="#fff" opacity=".8"/>`}
+  s+=`<circle cx="${cx}" cy="${cy}" r="22" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="8" fill="var(--accent)"/>`;$("#wheel").innerHTML=s})();
+let rp="s",rot=0,spinning=false;const rTurn=()=>$("#rTurn").innerHTML=av(rp);rTurn();
+const rIdle=()=>{$("#rRes").innerHTML=`<p class="muted" style="margin:0">Au tour de ${PL[rp].n}.</p>`};
+$("#rSpin").onclick=()=>{if(spinning)return;spinning=true;$("#rSpin").disabled=true;const idx=Math.random()*8|0,target=(360-(idx*45+22.5)+360)%360;
+  rot=rot+(RM()?360:1800)+((target-(rot%360))+360)%360;$("#wheel").style.transform=`rotate(${rot}deg)`;
+  setTimeout(()=>{spinning=false;$("#rSpin").disabled=false;let t=WH[idx][1];if(t==="VERITE"){const l=AV.v[2];t="Vérité pour {A} : "+l[Math.random()*l.length|0]}
+    const r=$("#rRes");r.innerHTML=`<div class="eyebrow">${WH[idx][0]}</div><p style="margin:6px 0 10px;font-family:var(--display);font-size:1.15rem;font-weight:600">${T(t,rp)}</p><div class="row"><button class="btn soft" id="rPass">Passer</button><button class="btn" id="rOk" style="flex:1">Fait</button></div>`;
+    r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");
+    $("#rOk").onclick=()=>{point(rp);burst($("#wheel"));rp=other(rp);rTurn();rIdle()};
+    $("#rPass").onclick=()=>{rp=other(rp);rTurn();rIdle()}},RM()?50:4300)};
+
+/* ===== DÉS 3D ===== */
+const DF=[["Embrasser","Masser","Effleurer","Souffler sur","Mordiller","Caresser"],["le cou","le dos","le ventre","les cuisses","les oreilles","la nuque"],["30 s","45 s","1 min","1 min 30","2 min","3 min"]];
+const DSEC=[30,45,60,90,120,180];
+const FACE=[[0,0],[0,-90],[0,-180],[0,90],[-90,0],[90,0]];
+const drot=[{x:-20,y:25},{x:-20,y:25},{x:-20,y:25}],dres=[0,0,2];
+$("#dice3d").innerHTML=DF.map((faces,d)=>`<div class="dscene"><div class="cube c${d}" id="cube${d}">${faces.map((f,i)=>`<div class="cf f${i}">${f.replace(" ","<br>")}</div>`).join("")}</div></div>`).join("");
+const setCube=(d,anim)=>{const c=$("#cube"+d);c.style.transitionDuration=anim?(1.2+d*.35)+"s":"0s";c.style.transform=`rotateX(${drot[d].x}deg) rotateY(${drot[d].y}deg)`};
+[0,1,2].forEach(d=>setCube(d,false));
+let dp="s",rolled=false,rolling=false;
+const dTurn=()=>$("#dTurn").innerHTML=av(dp);dTurn();
+$("#dSwap").onclick=()=>{dp=other(dp);dTurn();if(!$("#dRes").hidden)dShow()};
+function dShow(){const v=dres,act=DF[0][v[0]].toLowerCase(),sec=DSEC[v[2]],r=$("#dRes");r.hidden=false;r.style.background="linear-gradient(150deg,#4E2E7A,#A8215F)";
+  r.innerHTML=`<div class="top"><span>Au tour de ${PL[dp].n}</span><span>${DF[2][v[2]]}</span></div><div class="txt">${elide(`<em>${PL[dp].n}</em> va ${act} ${DF[1][v[1]]} de <em>${PL[other(dp)].n}</em>.`)}</div>${timerHTML(sec,"Go, on commence")}<div class="row" style="gap:8px;position:relative;z-index:1"><button class="btn ghostw" id="dPass">Passer</button><button class="btn whitebtn" id="dOk" style="flex:1">Fait</button></div>`;
+  bindTimer(r,sec);r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");
+  $("#dOk").onclick=()=>{stopT();point(dp);burst(r);r.hidden=true};$("#dPass").onclick=()=>{stopT();r.hidden=true}}
+$("#dRoll").onclick=()=>{if(rolling)return;stopT();if(rolled){dp=other(dp);dTurn()}rolled=true;rolling=true;$("#dRes").hidden=true;$("#dRoll").disabled=true;
+  [0,1,2].forEach(d=>{const i=Math.random()*6|0;dres[d]=i;const [fx,fy]=FACE[i];
+    const nx=Math.ceil((drot[d].x+1)/360)*360+720+fx,ny=Math.ceil((drot[d].y+1)/360)*360+(d%2?1080:720)+fy;drot[d]={x:nx-20,y:ny+20};
+    if(RM())drot[d]={x:fx-20,y:fy+20};setCube(d,!RM())});
+  setTimeout(()=>{rolling=false;$("#dRoll").disabled=false;dShow()},RM()?60:1950)};
+
+/* ===== TU PRÉFÈRES ===== */
+const TP=[["Un massage d'une heure","Un dîner aux chandelles"],["Le matin","Le soir"],["Lumière tamisée","Pénombre totale"],["Lent et tendre","Passionné et intense"],["Être surpris","Tout prévoir ensemble"],["Un week-end à l'hôtel","Une soirée cocooning"],["Des messages coquins","Des mots doux à l'oreille"],["Mener la danse","Se laisser guider"],["Une douche à deux","Un bain à deux"],["Une longue séance de baisers","Un long massage"],["Avec de la musique","Dans le silence"],["Un nouvel endroit","Une nouvelle position"],["Être déshabillé lentement","Se déshabiller devant l'autre"],["Les yeux bandés","Les yeux dans les yeux"],["Une surprise improvisée","Une soirée préparée"],["Câlin avant","Câlin après"]];
+let tpi=0,tps=0,tpA={};
+function tpStart(){tpi=fromBag("tp",TP.length);tps=0;tpA={};tpRender()}
+function tpInfo(){const s=sc("tp");$("#tpInfo").textContent=s.n?`${s.acc} accord${s.acc>1?"s":""} sur ${s.n}`:""}
+function tpRender(){const q=TP[tpi],box=$("#tpBox");tpInfo();
+  const p=tps===0?"s":"a";$("#tpTurn").innerHTML=av(p);
+  box.innerHTML=`<div class="eyebrow">${PL[p].n} répond en secret</div><h3 style="font-size:1.3rem;margin:6px 0 14px">Tu préfères…</h3><div class="tpo"><button data-o="0">${q[0]}</button><span>ou</span><button data-o="1">${q[1]}</button></div>`;
+  box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");
+  box.querySelectorAll("button").forEach(b=>b.onclick=()=>{tpA[p]=+b.dataset.o;tps++;if(tps===1){box.innerHTML=`<div class="pass"><p>Réponse enregistrée</p><h3>Passez le téléphone à ${PL.a.n}</h3><button class="btn" id="tpGo">C'est ${PL.a.n}</button></div>`;$("#tpGo").onclick=tpRender}else tpReveal()})}
+function tpReveal(){const q=TP[tpi],same=tpA.s===tpA.a,s=sc("tp");s.n++;if(same)s.acc++;scSave();tpInfo();$("#tpTurn").innerHTML="Résultat";
+  const box=$("#tpBox");box.innerHTML=`<div class="eyebrow" style="color:${same?"var(--ok)":"var(--mid)"}">${same?"Même réponse":"Avis différents"}</div><div class="reveal"><div><span class="avatar">${av("s")}</span><b>${q[tpA.s]}</b></div><div><span class="avatar">${av("a")}</span><b>${q[tpA.a]}</b></div></div><p class="small muted" style="margin:10px 0 12px">${same?"Vous êtes sur la même longueur d'onde. À mettre au programme ?":"Parfait pour en discuter : pourquoi ce choix ?"}</p><button class="btn" id="tpNext" style="width:100%;box-sizing:border-box">Question suivante</button>`;
+  box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");if(same)burst(box,14);
+  $("#tpNext").onclick=tpStart}
+
+/* ===== QUI ME CONNAÎT ? ===== */
+const QZ=[["Ce qui te met le plus dans l'ambiance ?","Qu'est-ce qui met le plus {X} dans l'ambiance ?",["Un massage","Des baisers dans le cou","Des mots doux","Une soirée sans écran"]],
+["Ton moment préféré pour un câlin ?","Le moment préféré de {X} pour un câlin ?",["Le matin","L'après-midi","Le soir","En pleine nuit"]],
+["Ce que tu préfères dans les préliminaires ?","Ce que {X} préfère dans les préliminaires ?",["Les baisers","Les caresses","Le massage","Prendre son temps"]],
+["Ton rythme idéal ?","Le rythme idéal de {X} ?",["Très lent","Tendre","Ça varie","Intense"]],
+["Ce qui te fait le plus d'effet chez {Y} ?","Ce qui fait le plus d'effet à {X} chez toi ?",["Le regard","La voix","Le parfum","Les mains"]],
+["L'ambiance que tu préfères ?","L'ambiance que {X} préfère ?",["Des bougies","La pénombre","La lumière du jour","Une musique douce"]],
+["Où préfères-tu être embrassé{x} ?","Où {X} préfère-t-{il} être embrassé{x} ?",["Le cou","Les lèvres","Le ventre","La nuque"]],
+["Ta soirée idéale à deux ?","La soirée idéale de {X} ?",["Un dîner au restaurant","Cocooning à la maison","Un week-end surprise","Bain et massage"]],
+["La position que tu préfères ?","La position préférée de {X} ?",["Face à face","Au-dessus","La cuillère","Ça dépend du moment"]],
+["Ce que tu préfères juste après ?","Ce que {X} préfère juste après ?",["Un long câlin","Discuter","Une douche","S'endormir collés"]]];
+let qzX="s",qzi=0,qzs=0,qzAns=null;
+const qzT=(t,x)=>t.replaceAll("{X}",PL[x].n).replaceAll("{Y}",PL[other(x)].n).replaceAll("{x}",PL[x].f?"e":"").replaceAll("{il}",PL[x].f?"elle":"il");
+function qzStart(){qzi=fromBag("qz",QZ.length);qzs=0;qzAns=null;qzRender()}
+function qzRender(){const q=QZ[qzi],box=$("#qzBox"),y=other(qzX);$("#qzInfo").textContent="Question sur "+PL[qzX].n;
+  box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");
+  if(qzs===0){$("#qzTurn").innerHTML=av(qzX);box.innerHTML=`<div class="eyebrow">${PL[qzX].n} répond en secret</div><h3 style="font-size:1.25rem;margin:6px 0 12px">${qzT(q[0],qzX)}</h3><div class="qzo">${q[2].map((o,i)=>`<button data-i="${i}">${o}</button>`).join("")}</div>`;
+    box.querySelectorAll("button").forEach(b=>b.onclick=()=>{qzAns=+b.dataset.i;qzs=1;box.innerHTML=`<div class="pass"><p>Réponse enregistrée</p><h3>Passez le téléphone à ${PL[y].n}</h3><button class="btn" id="qzGo">C'est ${PL[y].n}</button></div>`;$("#qzGo").onclick=qzRender})}
+  else{$("#qzTurn").innerHTML=av(y);box.innerHTML=`<div class="eyebrow">${PL[y].n} devine</div><h3 style="font-size:1.25rem;margin:6px 0 12px">${qzT(q[1],qzX)}</h3><div class="qzo">${q[2].map((o,i)=>`<button data-i="${i}">${o}</button>`).join("")}</div>`;
+    box.querySelectorAll("button").forEach(b=>b.onclick=()=>{const g=+b.dataset.i,ok=g===qzAns;if(ok){point(y);burst(b,12)}
+      box.querySelectorAll("button").forEach(x=>{x.disabled=true;const i=+x.dataset.i;if(i===qzAns)x.classList.add("right");else if(i===g)x.classList.add("wrong")});
+      const d=document.createElement("div");d.innerHTML=`<p style="margin:12px 0"><b style="color:${ok?"var(--ok)":"var(--no)"}">${ok?"Bien vu, +1 point pour "+PL[y].n+".":"Raté !"}</b> <span class="muted">${ok?"":PL[qzX].n+" a répondu « "+q[2][qzAns]+" ». Demandez-lui pourquoi."}</span></p><button class="btn" style="width:100%;box-sizing:border-box">Question suivante</button>`;
+      box.appendChild(d);d.querySelector("button").onclick=()=>{qzX=other(qzX);qzStart()}})}}
+
+/* ===== JE N'AI JAMAIS ===== */
+const JM=["pensé à l'autre toute une journée au travail.","envoyé un message coquin à l'autre.","eu envie de l'autre en plein repas avec des amis.","rêvé de nous deux la nuit.","regardé l'autre dormir.","eu envie d'essayer quelque chose sans oser le dire.","fait semblant de dormir pour prolonger un câlin.","relu nos anciens messages.","choisi un sous-vêtement en pensant à l'autre.","eu un fou rire pendant un moment intime.","imaginé notre prochaine soirée à deux pendant une réunion.","eu envie d'embrasser l'autre dans un lieu public.","repensé à notre premier baiser cette semaine.","eu envie de l'autre rien qu'en sentant son parfum."];
+let jmi=0,jmA={},jmCounted=false;
+function jmDraw(){jmi=fromBag("jm",JM.length);jmA={};jmCounted=false;$("#jmRes").hidden=true;
+  flipTo($("#jmCard"),`<div class="top"><span>Je n'ai jamais…</span><span>${JM.length} cartes</span></div><div class="txt">Je n'ai jamais ${JM[jmi]}</div><div></div>`);
+  $("#jmAns").innerHTML=["s","a"].map(p=>`<div class="jmrow"><span class="avatar">${av(p)}</span><div class="seg2" data-p="${p}"><button data-v="1" aria-pressed="false">Déjà fait</button><button data-v="0" aria-pressed="false">Jamais</button></div></div>`).join("");
+  $$("#jmAns .seg2").forEach(s=>s.querySelectorAll("button").forEach(b=>b.onclick=()=>{jmA[s.dataset.p]=+b.dataset.v;s.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(jmA.s!==undefined&&jmA.a!==undefined)jmRes()}))}
+function jmRes(){let t;if(jmA.s&&jmA.a)t="Vous avez ça en commun : un baiser de 20 secondes pour fêter ça.";
+  else if(jmA.s||jmA.a){const x=jmA.s?"s":"a",y=other(x);t=`${PL[x].n} raconte en détail, puis ${PL[y].n} lui donne un baiser dans le cou.`}
+  else t="Ni l'un ni l'autre : chacun dit s'il aimerait que ça arrive.";
+  if(!jmCounted){sc("jamais").n++;scSave();jmCounted=true}
+  const r=$("#jmRes");r.hidden=false;r.innerHTML=`<div class="eyebrow">Le gage</div><p style="margin:6px 0 0;font-family:var(--display);font-size:1.1rem;font-weight:600">${t}</p>`;
+  r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");if(jmA.s&&jmA.a)burst(r)}
+$("#jmNext").onclick=jmDraw;
+
+/* ===== MES CARTES ===== */
+let pl=2,psec=0;
+$("#pLvl").innerHTML=[1,2,3].map(l=>`<button class="chip" data-l="${l}" aria-pressed="${l===pl}">${GLV[l]}</button>`).join("");
+$$("#pLvl .chip").forEach(b=>b.onclick=()=>{pl=+b.dataset.l;$$("#pLvl .chip").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$("#pSec").innerHTML=[0,30,60,120,180].map(s=>`<button class="chip" data-s="${s}" aria-pressed="${s===psec}">${s?dur(s):"Sans"}</button>`).join("");
+$$("#pSec .chip").forEach(b=>b.onclick=()=>{psec=+b.dataset.s;$$("#pSec .chip").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$("#pAdd").onclick=()=>{const t=$("#pTxt").value.trim();if(!t){$("#pMsg").textContent="Écrivez d'abord le défi.";return}
+  PERSO.unshift({t,l:pl,sec:psec});savePerso();$("#pTxt").value="";$("#pMsg").textContent="Carte ajoutée.";burst($("#pAdd"),8);renderPerso()};
+function renderPerso(){$("#pList").innerHTML=PERSO.length?PERSO.map((c,i)=>`<div class="entry" style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center"><div><div>${T(esc(c.t),"a")}</div><div class="d">${GLV[c.l]}${c.sec?" · "+dur(c.sec):""}</div></div><button class="chip" data-del="${i}">Supprimer</button></div>`).join(""):`<div class="entry"><p class="muted" style="margin:0">Aucune carte pour l'instant. Votre première création apparaîtra ici.</p></div>`;
+  $$("[data-del]").forEach(b=>b.onclick=()=>{PERSO.splice(+b.dataset.del,1);savePerso();renderPerso()})}
+
+renderTiles();cIdle(false);avReset();jmDraw();
+
+/* ===== RITUEL DU JOUR ===== */
+const dkey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const dayN=Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+S.rit=S.rit||{};S.days=S.days||[];
+function streakOf(days){const set=new Set(days);let d=new Date();if(!set.has(dkey(d)))d.setDate(d.getDate()-1);let n=0;while(set.has(dkey(d))){n++;d.setDate(d.getDate()-1)}return n}
+function maxStreak(days){const ds=[...new Set(days)].sort();let best=0,cur=0,prev=null;ds.forEach(k=>{const t=new Date(k+"T12:00:00").getTime();cur=prev&&Math.round((t-prev)/864e5)===1?cur+1:1;best=Math.max(best,cur);prev=t});return best}
+(function(){const pl=dayN%2?"s":"a",lv=1+(dayN%2),card=GC[lv][dayN%GC[lv].length];$("#rDefi").innerHTML=T(card[0],pl)+(card[1]?` <span class="muted small">(${dur(card[1])})</span>`:"");
+  const p=POS[dayN%POS.length];$("#rPos").innerHTML=`<b>${p.n}</b> · <span class="muted">${p.d.split(".")[0]}.</span>`})();
+function renderRit(){const t=dkey(),r=S.rit[t]||{},n=["q","d","p"].filter(k=>r[k]).length;
+  $$(".rchk").forEach(b=>{const on=!!r[b.dataset.r];b.setAttribute("aria-pressed",on);b.closest(".rstep").classList.toggle("ok",on)});
+  $("#rCount").textContent=n+" / 3";$("#rbar").style.width=(n/3*100)+"%";
+  const st=streakOf(S.days);$("#stN").textContent=st;$("#stL").textContent=st>1?"jours":"jour";$("#streak").classList.toggle("hot",st>0);
+  $("#rDone").hidden=n<3;if(n===3)$("#rDoneTxt").textContent=st>1?`${st} jours d'affilée, continuez comme ça.`:"Revenez demain pour lancer votre série.";}
+$$(".rchk").forEach(b=>b.onclick=()=>{const t=dkey();S.rit[t]=S.rit[t]||{};const k=b.dataset.r;S.rit[t][k]=!S.rit[t][k];
+  const n=["q","d","p"].filter(x=>S.rit[t][x]).length;
+  if(n===3&&!S.days.includes(t)){S.days.push(t);setTimeout(()=>burst($("#ritual"),18),50)}
+  if(n<3)S.days=S.days.filter(x=>x!==t);
+  Object.keys(S.rit).forEach(k=>{if(k<dkey(new Date(Date.now()-40*864e5)))delete S.rit[k]});
+  save();renderRit();if(S.rit[t][k])burst(b,6)});
+renderRit();
+
+/* ===== MODE SOIRÉE ===== */
+let sDur=45,sLv=1,sIdx=0,sSteps=[],sTimer=null,sLeft=0,sRunning=false;
+$("#sDur").innerHTML=[30,45,60].map(d=>`<button class="chip" data-d="${d}" aria-pressed="${d===sDur}">${d} min</button>`).join("");
+$$("#sDur .chip").forEach(b=>b.onclick=()=>{sDur=+b.dataset.d;$$("#sDur .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));sPreview()});
+$("#sLvl").innerHTML=[1,2,3].map(l=>`<button class="chip" data-l="${l}" aria-pressed="${l===sLv}">${GLV[l]}</button>`).join("");
+$$("#sLvl .chip").forEach(b=>b.onclick=()=>{sLv=+b.dataset.l;$$("#sLvl .chip").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+function sBuild(){const f=sDur/45,m=x=>Math.max(60,Math.round(x*f/30)*30);
+  const q=QS[(dayN+1)%QS.length];const d=deck(sLv);const cards=[0,1,2,3].map(k=>d[fromBag("c"+sLv,d.length)]);
+  return [
+   {t:"Ambiance",sec:m(180),ic:"✦",x:"Lumière tamisée, musique douce, téléphones en silencieux sauf celui-ci. Un verre à portée de main. Installez-vous confortablement, l'un contre l'autre."},
+   {t:"Connexion",sec:m(300),x:`Chacun répond à cette question, l'autre écoute sans interrompre : « ${q} »`},
+   {t:"Massage",sec:m(600),half:true,x:"La moitié du temps chacun. Commencez par le dos et les épaules, mains à plat, gestes lents. Celui qui reçoit dit seulement « plus », « moins » ou « ailleurs »."},
+   {t:"Le jeu",sec:m(600),cards:cards,x:"Quatre cartes, chacun son tour. Lisez-les à voix haute et prenez votre temps."},
+   {t:"Votre moment",sec:0,x:"La suite vous appartient. Pas de chrono, pas d'objectif. Si l'envie vient d'essayer quelque chose de nouveau, la position du jour est là pour vous inspirer."},
+   {t:"Débrief",sec:m(180),x:"Restez blottis. Chacun dit une chose qu'il a aimée ce soir, et une envie pour la prochaine fois."}]}
+function sPreview(){const st=sBuild();$("#sPrev").innerHTML=`<div class="tl">${st.map(s=>`<div><b>${s.t}</b><span>${s.sec?dur(s.sec):"libre"}</span></div>`).join("")}</div>`}
+sPreview();
+function sStopT(){if(sTimer){clearInterval(sTimer);sTimer=null}sRunning=false}
+function sRender(){sStopT();const s=sSteps[sIdx];sLeft=s.sec;
+  $("#sDots").innerHTML=sSteps.map((x,i)=>`<i class="${i<sIdx?"d":i===sIdx?"c":""}"></i>`).join("");
+  const cards=s.cards?`<div class="scards">${s.cards.map((c,k)=>`<div class="scard" style="--k:${k}"><span>${k%2?PL.a.n:PL.s.n}</span>${T(c[0],k%2?"a":"s")}</div>`).join("")}</div>`:"";
+  $("#sStep").innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Étape ${sIdx+1} / ${sSteps.length}</span>${spk()}</div><h1 style="margin:6px 0 10px">${s.t}</h1><p class="sx" data-say>${s.x}</p>${cards}
+   ${s.sec?`<div class="bigt"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="sRing" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="bt"><b id="sT">${fmt(s.sec)}</b><span id="sHalf">${s.half?"Stéphanie reçoit":""}</span></div></div><button class="btn soft" id="sGo" style="display:block;margin:0 auto">Lancer le chrono</button>`:""}
+   ${sIdx===sSteps.length-1?`<button class="btn ghost" id="sJ" style="display:block;margin:14px auto 0">Noter dans le journal</button>`:""}`;
+  const sx=$("#sStep");sx.classList.remove("pop");void sx.offsetWidth;sx.classList.add("pop");
+  $("#sPrevB").disabled=sIdx===0;$("#sNextB").textContent=sIdx===sSteps.length-1?"Terminer la soirée":"Étape suivante";
+  if(s.sec)$("#sGo").onclick=()=>{if(sRunning){sStopT();$("#sGo").textContent="Reprendre";return}sRunning=true;$("#sGo").textContent="Pause";
+    sTimer=setInterval(()=>{sLeft--;$("#sT").textContent=fmt(Math.max(0,sLeft));$("#sRing").style.strokeDashoffset=(326.7*(1-sLeft/s.sec)).toFixed(1);
+      if(s.half)$("#sHalf").textContent=sLeft>s.sec/2?"Stéphanie reçoit":"Antoine reçoit";
+      if(s.half&&sLeft===Math.floor(s.sec/2)){burst($("#sT"),6);if(TTS)TTS.say("On inverse.")}
+      if(sLeft<=0){sStopT();$("#sT").textContent="Fini";$("#sGo").textContent="Relancer";burst($("#sT"),8);if(TTS)TTS.say("Étape terminée.")}},1000)};
+  if($("#sJ"))$("#sJ").onclick=()=>location.hash="journal";
+}
+$("#sStart").onclick=()=>{sSteps=sBuild();sIdx=0;$("#sSetup").hidden=true;$("#sRun").hidden=false;sRender();window.scrollTo(0,0)};
+$("#sPrevB").onclick=()=>{if(sIdx>0){sIdx--;sRender()}};
+$("#sNextB").onclick=()=>{if(sIdx<sSteps.length-1){sIdx++;sRender();window.scrollTo(0,0)}else{sStopT();S.soirees=(S.soirees||0)+1;save();burst($("#sNextB"),20);sQuit()}};
+function sQuit(){sStopT();if(TTS)TTS.stop();$("#sSetup").hidden=false;$("#sRun").hidden=true;sPreview()}
+$("#sQuit").onclick=sQuit;
+addEventListener("hashchange",()=>{if(location.hash!=="#soiree")sStopT();if(TTS)TTS.stop()});
+
+/* ===== ENVIES : liste à cocher ===== */
+S.bucket=S.bucket||{};
+const _rm=renderMatch;
+renderMatch=function(){_rm();const e=S.votes.elle,l=S.votes.lui;
+  const yes=D.map((d,i)=>i).filter(i=>e[i]==="oui"&&l[i]==="oui");
+  const todo=yes.filter(i=>!S.bucket[i]),done=yes.filter(i=>S.bucket[i]);
+  const row=(i,isDone)=>`<div class="mi bk ${isDone?"done":""}"><button class="bchk" data-b="${i}" aria-pressed="${isDone}" aria-label="${isDone?"Marquer comme à faire":"Marquer comme fait"}"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><div><div>${esc(D[i][1])}</div><div class="small muted">${LV[D[i][0]]}${isDone?" · fait le "+new Date(S.bucket[i]).toLocaleDateString("fr-FR",{day:"numeric",month:"long"}):""}</div></div></div>`;
+  $("#matchYes").innerHTML=todo.length?todo.map(i=>row(i,false)).join(""):`<p class="small muted">${yes.length?"Tout est fait. Bravo à vous deux.":"Rien pour l'instant. Répondez chacun de votre côté."}</p>`;
+  $("#matchDone").innerHTML=done.length?done.map(i=>row(i,true)).join(""):`<p class="small muted">Cochez une envie commune quand vous l'avez vécue.</p>`;
+  $$(".bchk").forEach(b=>b.onclick=()=>{const i=+b.dataset.b;if(S.bucket[i])delete S.bucket[i];else{S.bucket[i]=Date.now();burst(b,10)}save();pushBucket();setTimeout(renderMatch,S.bucket[i]?350:0)})};
+
+/* ===== DEUX TÉLÉPHONES ===== */
+const _save=save;
+let ME=null;try{ME=localStorage.getItem("adeux-me")}catch(e){}
+if(ME!=="s"&&ME!=="a")ME=null;
+const VK={s:"elle",a:"lui"};let DB=null,syncState="local";const wq={};
+function dbSet(path,data){if(!DB)return;const q=wq[path]||(wq[path]={});q.data=data;if(!q.busy)flushQ(path)}
+async function flushQ(path){const q=wq[path];if(!q.data){q.busy=false;return}q.busy=true;const d=q.data;q.data=null;
+  try{await DB.doc(path).set(d)}catch(e){if(e&&e.code==="invalid_argument")setSync("ro");else if(e&&e.code==="unavailable"){q.data=q.data||d;setTimeout(()=>flushQ(path),1500+Math.random()*1000);return}}
+  flushQ(path)}
+function pushVotes(){if(DB&&ME&&syncState==="on")dbSet("couple/votes-"+ME,{v:S.votes[VK[ME]]})}
+function pushBucket(){if(DB&&syncState==="on")dbSet("couple/bucket",{b:S.bucket})}
+function setSync(s){syncState=s;const dot=$("#sdot");dot.className="sdot "+s;
+  const msg={local:"Un seul téléphone : tout reste sur cet appareil.",on:"Synchronisé. Vos envies et votre liste se croisent automatiquement entre vos deux téléphones.",off:"La synchronisation n'est pas disponible dans cette vue. L'app fonctionne normalement sur ce téléphone.",ro:"Ce téléphone peut lire mais pas écrire. Dans le menu Partager, donnez le rôle Contributeur ou Éditeur."};
+  $("#syncState").textContent=msg[s];renderWho()}
+function renderWho(){$$("#meSeg button").forEach(b=>b.setAttribute("aria-pressed",(b.dataset.me||"")===(ME||"")));
+  const locked=ME&&syncState==="on";
+  $$(".who button").forEach(b=>{if(b.dataset.who==="match")return;const mine=b.dataset.who===VK[ME];b.disabled=!!locked&&!mine;b.classList.toggle("locked",!!locked&&!mine)});
+  if(locked&&who!=="match"&&who!==VK[ME]){who=VK[ME];$$(".who button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.who===who));renderDeck()}
+  $("#syncNote").hidden=!locked;}
+let subscribed=false;
+async function initSync(){if(!window.claude||!claude.use){setSync(ME?"off":"local");return}
+  try{DB=await claude.use("db")}catch(e){DB=null}
+  if(!DB){setSync(ME?"off":"local");return}
+  setSync(ME?"on":"local");if(subscribed)return;subscribed=true;
+  ["s","a"].forEach(p=>DB.doc("couple/votes-"+p).onSnapshot(sn=>{if(!ME)return;const v=sn.exists?(sn.data().v||{}):null;
+    if(p===ME){if(sn.metadata.hasPendingWrites)return;const mine=S.votes[VK[p]];if(!v){if(Object.keys(mine).length)pushVotes();return}
+      const extra=Object.keys(mine).some(k=>v[k]!==mine[k]);S.votes[VK[p]]=Object.assign({},v,mine);_save();if(extra)pushVotes()}
+    else{if(!v)return;S.votes[VK[p]]=Object.assign({},v);_save()}
+    if(who==="match")renderMatch();else renderDeck();scheduleBadges()},err=>{}));
+  DB.doc("couple/bucket").onSnapshot(sn=>{if(!ME||sn.metadata.hasPendingWrites)return;if(sn.exists){S.bucket=Object.assign({},sn.data().b||{});_save();if(who==="match")renderMatch();scheduleBadges()}else if(Object.keys(S.bucket).length)pushBucket()},err=>{});
+}
+$("#meSeg").innerHTML=[["s","Stéphanie"],["a","Antoine"],["","Un seul téléphone"]].map(([k,n])=>`<button data-me="${k}">${n}</button>`).join("");
+$$("#meSeg button").forEach(b=>b.onclick=()=>{const v=b.dataset.me||null;if(v===ME)return;ME=v;try{v?localStorage.setItem("adeux-me",v):localStorage.removeItem("adeux-me")}catch(e){}
+  setSync(ME?(DB?"on":"off"):"local");pushVotes();pushBucket();if(who==="match")renderMatch();else renderDeck()});
+$("#syncBtn").onclick=()=>{$("#syncBg").hidden=false;requestAnimationFrame(()=>$("#syncBg").classList.add("open"))};
+const closeSync=()=>{$("#syncBg").classList.remove("open");setTimeout(()=>$("#syncBg").hidden=true,RM()?0:250)};
+$("#syncClose").onclick=closeSync;$("#syncBg").onclick=e=>{if(e.target.id==="syncBg")closeSync()};
+setSync(ME?"off":"local");initSync();
+/* votes et réinitialisation synchronisés */
+const _vote=vote;vote=function(v,sw){_vote(v,sw);pushVotes();scheduleBadges()};
+$("#resetYes").onclick=()=>{S.votes={elle:{},lui:{}};save();$("#resetConfirm").hidden=true;renderMatch();if(DB&&syncState==="on"){dbSet("couple/votes-s",{v:{}});dbSet("couple/votes-a",{v:{}})}};
+
+/* ===== QUESTIONNAIRE D'ACCUEIL ===== */
+const OQ=[
+ {k:"goal",q:"Qu'est-ce que vous cherchez avant tout ?",o:[["desir","Raviver le désir"],["decouverte","Mieux se connaître et communiquer"],["fantasmes","De la nouveauté"],["ralentir","Prendre le temps"],["stress","Se retrouver après une période chargée"]]},
+ {k:"stage",q:"Où en est votre couple ?",o:[["new","On se découvre encore"],["mid","Quelques années ensemble"],["long","Une longue histoire"]]},
+ {k:"lvl",q:"Pour commencer les jeux, plutôt…",o:[["1","Doux et tendre"],["2","Complice et taquin"],["3","Audacieux"]]},
+ {k:"when",q:"Votre moment préféré pour vous retrouver ?",o:[["matin","Le matin"],["soir","Le soir"],["we","Le week-end"]]}];
+let oi=0,oA={};
+function oRender(){const box=$("#onbBox");
+  if(oi<OQ.length){const q=OQ[oi];box.innerHTML=`<div class="odots">${OQ.map((_,i)=>`<i class="${i<=oi?"on":""}"></i>`).join("")}</div><div class="eyebrow">Question ${oi+1} sur ${OQ.length}</div><h2 style="margin:6px 0 16px;font-size:1.5rem">${q.q}</h2><div class="oopts">${q.o.map(([v,t])=>`<button data-v="${v}">${t}</button>`).join("")}</div>`;
+    box.querySelectorAll(".oopts button").forEach(b=>b.onclick=()=>{oA[q.k]=b.dataset.v;b.classList.add("sel");setTimeout(()=>{oi++;oRender()},RM()?0:220)})}
+  else{const p=PR[oA.goal];const lv=+oA.lvl;
+    box.innerHTML=`<div class="eyebrow">Votre profil</div><h2 style="margin:6px 0 10px;font-size:1.6rem">Votre parcours : ${p.t}</h2><p class="muted">${p.d} ${oA.when==="matin"?"Pensez aux moments du matin : la cuillère est parfaite au réveil.":oA.when==="we"?"Le mode Soirée de 60 minutes est fait pour vos week-ends.":"Le mode Soirée vous attend, en 45 minutes."}</p><div class="callout" style="margin:12px 0 16px">Les jeux démarreront au niveau <b>${GLV[lv]}</b>. Vous pourrez toujours changer.</div><button class="btn" id="oGo" style="width:100%;box-sizing:border-box">C'est parti</button>`;
+    $("#oGo").onclick=()=>{S.prof=oA;S.prog=oA.goal;save();applyProf();renderL();closeOnb();burst($("#heroT"),14)}}
+  box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop")}
+function applyProf(){if(!S.prof)return;const lv=+S.prof.lvl||1;glvl.cartes=lv;glvl.av=lv;sLv=lv;
+  $$(".lvlc .chip").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.l===lv));$$("#sLvl .chip").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.l===lv));cIdle(false);avReset()}
+function openOnb(){oi=0;oA={};$("#onb").hidden=false;oRender()}
+function closeOnb(){$("#onb").hidden=true}
+$("#onbSkip").onclick=()=>{S.prof=S.prof||{skipped:1};save();closeOnb()};
+$("#redoOnb").onclick=openOnb;
+if(!S.prof)openOnb();else applyProf();
+
+/* ===== BADGES ===== */
+const BD=[
+ ["premier","Premier pas","Une étape de parcours terminée",()=>Object.keys(PR).some(p=>pcount(p)>0)],
+ ["parcours","Parcours bouclé","Un parcours terminé en entier",()=>Object.keys(PR).some(p=>pcount(p)===PR[p].s.length)],
+ ["serie3","3 jours de suite","Le rituel du jour, 3 jours d'affilée",()=>maxStreak(S.days)>=3],
+ ["serie7","Une semaine","Le rituel du jour, 7 jours d'affilée",()=>maxStreak(S.days)>=7],
+ ["defis10","10 défis","10 défis relevés dans les jeux",()=>POINTS.reduce((n,g)=>n+sc(g).s+sc(g).a,0)>=10],
+ ["defis50","50 défis","50 défis relevés dans les jeux",()=>POINTS.reduce((n,g)=>n+sc(g).s+sc(g).a,0)>=50],
+ ["envie","Même longueur d'onde","Une première envie en commun",()=>D.some((d,i)=>S.votes.elle[i]==="oui"&&S.votes.lui[i]==="oui")],
+ ["vecu","Ça, c'est fait","5 envies communes vécues",()=>Object.keys(S.bucket||{}).length>=5],
+ ["journal","Premier débrief","Un moment noté dans le journal",()=>S.journal.length>=1],
+ ["soiree","Soirée complète","Un mode Soirée mené jusqu'au bout",()=>(S.soirees||0)>=1],
+ ["accords","Âmes sœurs","5 accords à « Tu préfères »",()=>sc("tp").acc>=5],
+ ["expert","Expert de l'autre","5 bonnes réponses à « Qui me connaît ? »",()=>sc("quiz").s+sc("quiz").a>=5],
+ ["createur","Créatifs","Une carte perso créée",()=>PERSO.length>=1]];
+S.badges=S.badges||{};let badgeInit=true;
+function checkBadges(){let fresh=[];BD.forEach(b=>{if(!S.badges[b[0]]&&b[3]()){S.badges[b[0]]=Date.now();fresh.push(b)}});
+  if(fresh.length){save();if(!badgeInit)fresh.forEach((b,i)=>setTimeout(()=>toast(b),i*1800))}renderBadges()}
+function renderBadges(){const n=Object.keys(S.badges).length;$("#bCount").textContent=`${n} / ${BD.length}`;
+  $("#badges").innerHTML=BD.map((b,i)=>{const on=!!S.badges[b[0]];return `<div class="badge ${on?"on":""}" style="--h:${(i*47)%360}"><div class="medal"><svg viewBox="0 0 40 40"><path d="M13 3l-4 12M27 3l4 12" class="rib"/><circle cx="20" cy="24" r="12" class="disc"/><path d="M20 17l2.2 4.4 4.8.7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z" class="star"/></svg></div><b>${b[1]}</b><span>${b[2]}</span></div>`}).join("")}
+function toast(b){const t=$("#toast");t.innerHTML=`<div class="medal on"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" class="disc"/><path d="M20 12l2.4 4.8 5.3.8-3.8 3.7.9 5.2-4.8-2.5-4.8 2.5.9-5.2-3.8-3.7 5.3-.8z" class="star"/></svg></div><div><div class="eyebrow">Badge débloqué</div><b>${b[1]}</b></div>`;
+  t.hidden=false;t.classList.remove("show");void t.offsetWidth;t.classList.add("show");burst(t,12);clearTimeout(t._h);t._h=setTimeout(()=>{t.classList.remove("show");setTimeout(()=>t.hidden=true,300)},2600)}
+checkBadges();badgeInit=false;
+save=function(){_save();scheduleBadges()};
+const _scs=scSave;scSave=function(){_scs();scheduleBadges()};
+const _sp=savePerso;savePerso=function(){_sp();scheduleBadges()};
+
+/* ===== RETOUR PAR GLISSEMENT DEPUIS LE BORD ===== */
+(function(){let sx=null,sy=0;document.addEventListener("touchstart",e=>{const t=e.touches[0];sx=t.clientX<26?t.clientX:null;sy=t.clientY},{passive:true});
+  document.addEventListener("touchend",e=>{if(sx===null)return;const t=e.changedTouches[0];if(t.clientX-sx>80&&Math.abs(t.clientY-sy)<60){const b=$("#back");if(!b.hidden)b.click();else if(!$("#gBackRow").hidden)$("#gBack").click()}sx=null},{passive:true})})();
+/* ===== CODE D'ÉCHANGE ===== */
+const XK="adeux-stephanie-antoine",VC={oui:"o",peut:"p",non:"n"},CV={o:"oui",p:"peut",n:"non"};
+const xor=str=>Array.from(str).map((c,i)=>String.fromCharCode(c.charCodeAt(0)^XK.charCodeAt(i%XK.length))).join("");
+const b64u=t=>btoa(t).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const ub64=t=>atob(t.replace(/-/g,"+").replace(/_/g,"/"));
+const ck=t=>(Array.from(t).reduce((a,c)=>(a*31+c.charCodeAt(0))%1296,7)).toString(36).padStart(2,"0");
+function exportCode(p){const v=S.votes[p]||{};const body=(p==="elle"?"s":"a")+D.map((_,i)=>VC[v[i]]||"-").join("")+"|"+Object.keys(S.bucket||{}).map(k=>(+k).toString(36)+"."+Math.round(S.bucket[k]/6e4).toString(36)).join(",");
+  return "AD1-"+b64u(xor(body))+ck(body)}
+function importCode(code){code=String(code).trim().replace(/\s+/g,"");if(!/^AD1-[A-Za-z0-9_-]+$/.test(code))throw "format";
+  const raw=code.slice(4),sum=raw.slice(-2);let body;try{body=xor(ub64(raw.slice(0,-2)))}catch(e){throw "format"}
+  if(ck(body)!==sum)throw "check";const [vp,bp]=body.split("|");const p=vp[0]==="s"?"elle":vp[0]==="a"?"lui":null;if(!p||vp.length-1!==D.length)throw "format";
+  const votes={};Array.from(vp.slice(1)).forEach((c,i)=>{if(CV[c])votes[i]=CV[c]});
+  const bucket={};(bp||"").split(",").filter(Boolean).forEach(x=>{const [k,t]=x.split(".");const i=parseInt(k,36);if(i>=0&&i<D.length)bucket[i]=parseInt(t,36)*6e4});
+  return {p,votes,bucket}}
+$$("[data-xp]").forEach(b=>b.onclick=()=>{const p=b.dataset.xp,n=p==="elle"?"Stéphanie":"Antoine",c=exportCode(p),cnt=Object.keys(S.votes[p]||{}).length;
+  $("#xOut").hidden=false;$("#xCode").value=c;$("#xLbl").textContent=`Code de ${n} · ${cnt} réponse${cnt>1?"s":""}`;$("#xCopied").textContent=cnt?"":"Aucune réponse pour l'instant.";
+  $("#xShare").hidden=!navigator.share;$("#xOut").classList.remove("pop");void $("#xOut").offsetWidth;$("#xOut").classList.add("pop")});
+$("#xCopy").onclick=()=>{const c=$("#xCode").value,done=()=>{$("#xCopied").textContent="Copié. Collez-le dans un message.";burst($("#xCopy"),6)};
+  const sel=()=>{const i=$("#xCode");i.focus();i.select();i.setSelectionRange(0,99999);try{document.execCommand("copy");done()}catch(e){$("#xCopied").textContent="Sélectionnez le code et copiez-le."}};
+  try{navigator.clipboard.writeText(c).then(done,sel)}catch(e){sel()}};
+$("#xShare").onclick=()=>{try{navigator.share({text:"Mon code À Deux : "+$("#xCode").value}).catch(()=>{})}catch(e){}};
+$("#xImp").onclick=()=>{const m=$("#xMsg");try{const r=importCode($("#xIn").value);S.votes[r.p]=Object.assign({},S.votes[r.p],r.votes);Object.assign(S.bucket,r.bucket);save();
+    const n=r.p==="elle"?"Stéphanie":"Antoine",cnt=Object.keys(r.votes).length;m.style.color="var(--ok)";m.textContent=`Réponses de ${n} importées : ${cnt}.`;$("#xIn").value="";
+    burst($("#xImp"),10);$$(".who button").find(x=>x.dataset.who==="match").click();if(typeof pushVotes==="function"){pushVotes();pushBucket()}}
+  catch(e){m.style.color="var(--no)";m.textContent=e==="check"?"Ce code est incomplet. Recopiez-le en entier.":"Ce n'est pas un code À Deux valide."}};
+/* ===== RANGÉES DÉFILANTES : indice visuel, molette et glisser à la souris ===== */
+$$(".chips").forEach(c=>{const upd=()=>{const more=c.scrollWidth>c.clientWidth+4;c.classList.toggle("more",more);c.classList.toggle("atstart",c.scrollLeft<4);c.classList.toggle("atend",c.scrollLeft+c.clientWidth>=c.scrollWidth-4)};
+  c.addEventListener("scroll",upd,{passive:true});if(window.ResizeObserver)new ResizeObserver(upd).observe(c);new MutationObserver(upd).observe(c,{childList:true});upd();
+  c.addEventListener("wheel",e=>{if(c.scrollWidth>c.clientWidth&&Math.abs(e.deltaY)>Math.abs(e.deltaX)){c.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+  let down=false,x0=0,l0=0,dragged=false;
+  c.addEventListener("mousedown",e=>{down=true;dragged=false;x0=e.clientX;l0=c.scrollLeft});
+  addEventListener("mousemove",e=>{if(!down)return;const dx=e.clientX-x0;if(Math.abs(dx)>4){dragged=true;c.scrollLeft=l0-dx}});
+  addEventListener("mouseup",()=>{down=false});
+  c.addEventListener("click",e=>{if(dragged){e.stopPropagation();e.preventDefault();dragged=false}},true);});
+route();
+
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+</body>
+</html>
