@@ -31,6 +31,7 @@ export default async (req) => {
 
   let body = {};
   try { body = await req.json(); } catch { return json({ error: "bad_request" }, 400); }
+  if (body.kind === "quiz") return quiz(body, apiKey);
   const theme = THEMES[body.theme] ? body.theme : "connaissance";
   const n = Math.min(Math.max(parseInt(body.n, 10) || 12, 1), 20);
   const avoid = (Array.isArray(body.avoid) ? body.avoid : []).slice(-60).map(clean).filter(Boolean);
@@ -71,5 +72,32 @@ Réponds uniquement avec un tableau JSON de chaînes, sans aucun texte autour.`;
   items = (Array.isArray(items) ? items : []).filter((t) => typeof t === "string" && !/[<>]|\{(?!B\})/.test(t)).map(clean).filter((t) => t.length >= 12);
   return json({ theme, items });
 };
+
+const CATS = ["geo", "hist", "sci", "arts", "divert", "sport"];
+async function quiz(body, apiKey) {
+  const n = Math.min(Math.max(parseInt(body.n, 10) || 10, 1), 20);
+  const avoid = (Array.isArray(body.avoid) ? body.avoid : []).slice(-60).map(clean).filter(Boolean);
+  const prompt = `Écris ${n} questions de culture générale à choix multiple, façon Trivial Pursuit, en français.
+Catégories (champ "c") : geo = Géographie, hist = Histoire, sci = Sciences et nature, arts = Arts et littérature, divert = Divertissement, sport = Sports et loisirs. Répartis-les entre les catégories.
+Chaque question porte sur un fait certain, connu et vérifiable, sans ambiguïté, qui ne risque pas de changer avec le temps. Donne la bonne réponse et trois mauvaises réponses plausibles, toutes différentes.
+N'utilise aucune de ces questions :
+${avoid.map((a) => "• " + a).join("\n")}
+Réponds uniquement avec un tableau JSON d'objets : [{"c":"geo","q":"…","a":"bonne réponse","w":["…","…","…"]}]`;
+  let r;
+  try {
+    r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({ model: process.env.ADEUX_QUIZ_MODEL || process.env.ADEUX_MODEL || "claude-sonnet-5-5", max_tokens: 3000, messages: [{ role: "user", content: prompt }] }),
+    });
+  } catch { return json({ error: "upstream" }, 502); }
+  if (!r.ok) return json({ error: "upstream", status: r.status }, 502);
+  const data = await r.json().catch(() => ({}));
+  const text = (data.content || []).filter((c) => c.type === "text").map((c) => c.text).join("");
+  let items = []; const m = text.match(/\[[\s\S]*\]/); if (m) { try { items = JSON.parse(m[0]); } catch { items = []; } }
+  items = (Array.isArray(items) ? items : []).filter((it) => it && typeof it.q === "string" && typeof it.a === "string" && Array.isArray(it.w) && it.w.length >= 3 && CATS.includes(it.c) && !/[<>]/.test(it.q + it.a + it.w.join("")))
+    .map((it) => ({ c: it.c, q: clean(it.q), a: clean(it.a), w: it.w.slice(0, 3).map(clean) }));
+  return json({ items });
+}
 
 export const config = { path: "/api/questions" };
