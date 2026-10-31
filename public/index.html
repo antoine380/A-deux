@@ -720,6 +720,42 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 .wklegend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
 .wklegend span{display:inline-flex;align-items:center;gap:6px}
 
+/* ===== v12 : points ===== */
+.scorepill{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:99px;background:var(--raise);border:1px solid var(--line);font-variant-numeric:tabular-nums;flex:none}
+.scorepill .sp{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-family:var(--display);font-size:.95rem;color:var(--muted);transition:color .2s}
+.scorepill .sp i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.66rem;font-family:var(--body)}
+.scorepill .sp.s i{background:var(--accent)}.scorepill .sp.a i{background:var(--plum-2)}
+.scorepill .sp.lead{color:var(--fg)}
+.scorepill .sp.lead b::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:3px;vertical-align:5px}
+.scorepill .spv{color:var(--line);font-weight:800}
+.scorepill:focus-visible{outline:2px solid var(--accent)}
+@media (prefers-reduced-motion:no-preference){.scorepill.bump2{animation:bump .6s cubic-bezier(.2,1.6,.4,1)}}
+.ptsplus{font-size:.85rem;white-space:nowrap}
+.faceoff{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:14px 0 8px}
+.fo{display:flex;align-items:center;gap:10px}
+.fo.a{justify-content:flex-end}
+.fo b{font-family:var(--display);font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.fo.s b{color:var(--accent)}.fo.a b{color:var(--plum-2)}
+.fo .avatar{flex-direction:column;gap:2px;font-size:.78rem}
+.fovs{font-family:var(--display);font-weight:800;color:var(--muted);font-size:.85rem}
+.fobar{height:10px;border-radius:5px;background:var(--plum-2);overflow:hidden}
+.fobar span{display:block;height:100%;background:var(--accent);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.folead{text-align:center;font-weight:700;margin:10px 0}
+.ptscat{display:flex;flex-direction:column}
+.pcrow{display:grid;grid-template-columns:1fr 52px 52px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.pcrow:last-child{border-bottom:0}
+.pcrow b{text-align:right;font-family:var(--display)}
+.pcrow b.s{color:var(--accent)}.pcrow b.a{color:var(--plum-2)}
+.pcrow.zero{opacity:.5}
+.ptslog{display:flex;flex-direction:column;gap:6px}
+.ptslog div{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:.9rem}
+.ptslog small{color:var(--muted);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%}
+.dot.s{background:var(--accent)}.dot.a{background:var(--plum-2)}
+.ptshow{margin-top:14px;font-size:.9rem}
+.ptshow summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.ptshow p{margin:6px 0}
+@media (max-width:360px){.topbar .brand{font-size:1.1rem}.scorepill .sp b{font-size:.85rem}}
 /* TAB BAR */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
@@ -738,6 +774,7 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
   <div class="wrap">
     <button class="back" id="back" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Apprendre</button>
     <div class="brand" id="brand"><i></i>À Deux</div>
+    <button class="scorepill" id="scorePill" aria-label="Scores"></button>
     <button class="iconbtn" id="syncBtn" aria-label="Deux téléphones"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="2"/><rect x="13" y="5" width="8" height="14" rx="2"/><path d="M6.5 16h1M16.5 16h1"/></svg><span class="sdot" id="sdot"></span></button>
   </div>
 </header>
@@ -1379,6 +1416,15 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
 
 <div class="toast" id="toast" hidden role="status"></div>
 
+<div class="sheet-bg" id="ptsBg" hidden>
+  <div class="sheet2" role="dialog" aria-modal="true" aria-labelledby="ptsT">
+    <div class="grab"></div>
+    <h2 id="ptsT" style="margin-top:4px">Les points du couple</h2>
+    <div id="ptsBody"></div>
+    <button class="btn" id="ptsClose" style="width:100%;box-sizing:border-box;margin-top:14px">Fermer</button>
+  </div>
+</div>
+
 <div class="sheet-bg" id="adultBg" hidden>
   <div class="sheet2" role="dialog" aria-modal="true" aria-labelledby="adultT">
     <div class="grab"></div>
@@ -1512,7 +1558,7 @@ function openL(i){
   const p=S.prog,l=PR[p].s[i],sh=$("#lessonSheet");sh.hidden=false;openStep=i;
   sh.innerHTML=`<div class="row" style="justify-content:space-between"><div class="eyebrow">Étape ${i+1} · ${PR[p].t}</div>${spk()}</div><h2 style="margin:4px 0 6px">${l[0]}</h2><p class="small muted">${l[1]}</p><div data-say><ol>${l[2].map(x=>"<li>"+x+"</li>").join("")}</ol><div class="callout" style="margin-bottom:14px">${l[3]}</div></div><button class="btn" id="lDone">${pdone(p,i)?"Marquer comme à refaire":"Marquer comme faite"}</button>`;
   sh.classList.remove("pop");void sh.offsetWidth;sh.classList.add("pop");
-  $("#lDone").onclick=()=>{S.pd[p]=S.pd[p]||{};S.pd[p][i]=!S.pd[p][i];save();renderL();openL(i);if(S.pd[p][i])burst($("#lDone"),10)};
+  $("#lDone").onclick=()=>{S.pd[p]=S.pd[p]||{};S.pd[p][i]=!S.pd[p][i];save();renderL();openL(i);if(S.pd[p][i]){burst($("#lDone"),10);["s","a"].forEach(w=>addPts(w,5,"parcours",`pc-${p}-${i}-${w}`,"Étape de parcours"))}};
   sh.scrollIntoView({behavior:"smooth",block:"start"});
 }
 renderL();
@@ -1648,7 +1694,7 @@ const J={cx:0,pe:0,pl:0};
 $$(".rate").forEach(r=>{r.innerHTML=[1,2,3,4,5].map(n=>`<button aria-pressed="false" data-n="${n}">${n}</button>`).join("");r.querySelectorAll("button").forEach(b=>b.onclick=()=>{J[r.dataset.k]=+b.dataset.n;r.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))})});
 $("#jSave").onclick=()=>{
   if(!J.cx||!J.pe||!J.pl){$("#jMsg").textContent="Notez les trois critères pour enregistrer.";return}
-  S.journal.unshift({d:Date.now(),cx:J.cx,pe:J.pe,pl:J.pl,k:$("#jKeep").value.trim(),t:$("#jTry").value.trim()});save();
+  S.journal.unshift({d:Date.now(),cx:J.cx,pe:J.pe,pl:J.pl,k:$("#jKeep").value.trim(),t:$("#jTry").value.trim()});save();["s","a"].forEach(w=>addPts(w,3,"journal",`jr-${S.journal[0].d}-${w}`,"Moment noté au journal"));
   J.cx=J.pe=J.pl=0;$$(".rate button").forEach(b=>b.setAttribute("aria-pressed","false"));$("#jKeep").value="";$("#jTry").value="";
   $("#jMsg").textContent="Enregistré.";renderJ();
 };
@@ -1691,7 +1737,7 @@ let scSave=()=>{try{localStorage.setItem("adeux-scores",JSON.stringify(SC))}catc
 const sc=g=>SC[g]||(SC[g]={s:0,a:0,n:0,acc:0});
 const POINTS=["questions","cartes","av","roue","des","quiz"];
 let curGame=null;
-function point(p){const s=sc(curGame);s[p]++;scSave();renderPScore(p);renderTiles()}
+function point(p){const s=sc(curGame);s[p]++;scSave();renderPScore(p);renderTiles();if(!NET.inRemote&&typeof addPts==="function")addPts(p,1,"jeux","g-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),GN[curGame]?GN[curGame][0]:"Jeux")}
 function renderPScore(bumped){const box=$("#pScore");if(!curGame||!POINTS.includes(curGame)){box.hidden=true;return}box.hidden=false;const s=sc(curGame);
   box.innerHTML=["s","a"].map(p=>`<div data-p="${p}"><span class="avatar">${av(p)}</span><b class="${bumped===p?"bump":""}">${s[p]}</b></div>`).join("")+`<button class="chip" id="scReset">Remettre à zéro</button>`;
   if(bumped)plusOne(box.querySelector(`[data-p="${bumped}"] b`));
@@ -2025,7 +2071,7 @@ function renderRit(){const t=dkey(),r=S.rit[t]||{},n=["q","d","p"].filter(k=>r[k
   $("#rDone").hidden=n<3;if(n===3)$("#rDoneTxt").textContent=st>1?`${st} jours d'affilée, continuez comme ça.`:"Revenez demain pour lancer votre série.";}
 $$(".rchk").forEach(b=>b.onclick=()=>{const t=dkey();S.rit[t]=S.rit[t]||{};const k=b.dataset.r;S.rit[t][k]=!S.rit[t][k];
   const n=["q","d","p"].filter(x=>S.rit[t][x]).length;
-  if(n===3&&!S.days.includes(t)){S.days.push(t);setTimeout(()=>burst($("#ritual"),18),50)}
+  if(n===3&&!S.days.includes(t)){S.days.push(t);setTimeout(()=>burst($("#ritual"),18),50);(ME?[ME]:["s","a"]).forEach(p=>addPts(p,3,"rituel",`rit-${t}-${p}`,"Rituel du jour complet"))}
   if(n<3)S.days=S.days.filter(x=>x!==t);
   Object.keys(S.rit).forEach(k=>{if(k<dkey(new Date(Date.now()-40*864e5)))delete S.rit[k]});
   save();renderRit();if(S.rit[t][k])burst(b,6)});
@@ -2066,7 +2112,7 @@ function sRender(){sStopT();const s=sSteps[sIdx];sLeft=s.sec;
 }
 $("#sStart").onclick=()=>{sSteps=sBuild();sIdx=0;$("#sSetup").hidden=true;$("#sRun").hidden=false;sRender();window.scrollTo(0,0)};
 $("#sPrevB").onclick=()=>{if(sIdx>0){sIdx--;sRender()}};
-$("#sNextB").onclick=()=>{if(sIdx<sSteps.length-1){sIdx++;sRender();window.scrollTo(0,0)}else{sStopT();S.soirees=(S.soirees||0)+1;save();burst($("#sNextB"),20);sQuit()}};
+$("#sNextB").onclick=()=>{if(sIdx<sSteps.length-1){sIdx++;sRender();window.scrollTo(0,0)}else{sStopT();S.soirees=(S.soirees||0)+1;save();{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);["s","a"].forEach(w=>addPts(w,10,"soiree",`so-${id}-${w}`,"Soirée menée au bout"))}burst($("#sNextB"),20);sQuit()}};
 function sQuit(){sStopT();if(TTS)TTS.stop();$("#sSetup").hidden=false;$("#sRun").hidden=true;sPreview()}
 $("#sQuit").onclick=sQuit;
 addEventListener("hashchange",()=>{if(location.hash!=="#soiree")sStopT();if(TTS)TTS.stop()});
@@ -2230,7 +2276,7 @@ function netAttach(c){
     if(curGame==="tp")tpRender();if(curGame==="quiz")qzRender()});
   c.on("data",d=>{let m;try{m=typeof d==="string"?JSON.parse(d):d}catch(e){return}if(!m||typeof m!=="object")return;
     if(m._t==="hello"){if(m.p===ME){netStatus("same");try{c.close()}catch(e){}}return}
-    const f=NET.h[m._t];if(f){try{f(m)}catch(e){console.error(e)}}});
+    const f=NET.h[m._t];if(f){try{NET.inRemote=true;f(m)}catch(e){console.error(e)}finally{NET.inRemote=false}}});
   c.on("close",()=>{if(NET.conn===c){NET.up=false;NET.conn=null;netStatus(navigator.onLine===false?"off":"wait");if(curGame==="tp")tpRender();if(curGame==="quiz")qzRender()}});
   c.on("error",()=>{});
 }
@@ -2311,7 +2357,7 @@ async function relay(type,data,note){if(NET.up){NET.send(type,data);return "dire
 let pulling=false;
 async function boxPull(){if(!BOX||!BKEY||!ME||pulling)return;pulling=true;
   try{const r=await JP("/api/box",{action:"pull",box:BOX,me:ME});if(!r.ok)return;const j=await r.json();const keys=[];
-    for(const m of (j.msgs||[]).sort((a,b)=>a.ts-b.ts)){keys.push(m.key);try{const o=await unseal(m.data);const f=NET.h[o.type];if(f&&RELAY_T.has(o.type))f(Object.assign({},o.data,{_via:"box"}))}catch(e){}}
+    for(const m of (j.msgs||[]).sort((a,b)=>a.ts-b.ts)){keys.push(m.key);try{const o=await unseal(m.data);const f=NET.h[o.type];if(f&&RELAY_T.has(o.type)){NET.inRemote=true;try{f(Object.assign({},o.data,{_via:"box"}))}finally{NET.inRemote=false}}}catch(e){}}
     if(keys.length)await JP("/api/box",{action:"ack",box:BOX,me:ME,keys})}catch(e){}finally{pulling=false}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")boxPull()});
 setInterval(()=>{if(document.visibilityState==="visible")boxPull()},90000);
@@ -2474,7 +2520,7 @@ function renderQzOpen(k,play){const d=qzSnap(k);const items=d.ix.map(g=>({g,it:q
       relay("qans",{d:k,p:w,ans:d[w],ix:d.ix,t:d["t"+w]});if(!ME||w===ME){if(whoList().every(p=>d[p]))pushDone(k)}
       burst($("#qzSend"),14);qa=null;renderQuiz();renderMorning()}}}
 function bindQw(play){play.querySelectorAll("[data-qw]").forEach(b=>b.onclick=()=>{qa=Object.assign(qa||{},{who:b.dataset.qw,i:0,picks:[]});renderQuiz()})}
-function renderQzRes(k,play){const d=qzSnap(k);const sc={s:dayScore(k,"s"),a:dayScore(k,"a")},n=d.ix.length;
+function renderQzRes(k,play){const d=qzSnap(k);if(typeof ptsQuiz==="function")setTimeout(ptsQuiz,0);const sc={s:dayScore(k,"s"),a:dayScore(k,"a")},n=d.ix.length;
   const win=sc.s==null&&sc.a==null?"Personne n'a répondu aujourd'hui.":sc.s==null||sc.a==null?"":sc.s===sc.a?"Égalité !":`${sc.s>sc.a?PL.s.n:PL.a.n} gagne la journée.`;
   play.innerHTML=`<div class="card"><div class="score qzsc"><div><span class="avatar">${av("s")}</span><b>${sc.s==null?"–":sc.s+"/"+n}</b></div><div><span class="avatar">${av("a")}</span><b>${sc.a==null?"–":sc.a+"/"+n}</b></div></div>${win?`<p style="margin:10px 0 0;font-weight:700">${win}</p>`:""}</div>
   <div class="stack" style="margin-top:10px">${d.ix.map((g,i)=>{const it=qAt(g);if(!it)return "";const {o,ok}=qOpts(g,it);const cat=QC[it.c]||QC[0];
@@ -2518,7 +2564,7 @@ const sentMsg=(how,what)=>how==="direct"?`${what} envoyé${what==="Photo"?"e":""
 $("#phGo").onclick=async()=>{if(!phSel)return;const b=$("#phGo");b.disabled=true;$("#phSt").textContent="Envoi…";
   try{const p=await IDB.get("photos",phSel);const img=await blobToData(p.big);const item={id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:"photo",img,c:txt($("#phMsg").value),t:p.t,ts:Date.now(),from:ME};
     const how=await relay("photo",item,"photo");if(!how){$("#phSt").textContent=sendFail();return}
-    S.ph.sent[phSel]=Date.now();save();await IDB.put("recus",Object.assign({},item,{mine:1}));$("#phMsg").value="";$("#phSt").textContent=sentMsg(how,"Photo");burst(b,12);renderPhotos();renderRecus();renderMorning()}
+    S.ph.sent[phSel]=Date.now();save();addPts(ME,3,"partage","ph-"+item.id,"Photo souvenir envoyée");await IDB.put("recus",Object.assign({},item,{mine:1}));$("#phMsg").value="";$("#phSt").textContent=sentMsg(how,"Photo");burst(b,12);renderPhotos();renderRecus();renderMorning()}
   catch(e){$("#phSt").textContent=sendFail()}finally{b.disabled=false}};
 
 /* ===== PARTAGE : MUSIQUE ===== */
@@ -2528,7 +2574,7 @@ $("#muGo").onclick=async()=>{const raw=$("#muUrl").value,m=raw.match(/https:\/\/
   if(!sv){$("#muSt").textContent="Collez un lien de partage Spotify, Apple Music, Deezer ou YouTube.";return}
   const b=$("#muGo");b.disabled=true;const item={id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),kind:"music",url,c:txt($("#muMsg").value),ts:Date.now(),from:ME};
   const how=await relay("music",item,"music");b.disabled=false;if(!how){$("#muSt").textContent=sendFail();return}
-  try{await IDB.put("recus",Object.assign({},item,{mine:1}))}catch(e){}$("#muUrl").value="";$("#muMsg").value="";$("#muSt").textContent=sentMsg(how,"Morceau");burst(b,10);S.mu=S.mu||{};S.mu[today()]=1;save();renderRecus();renderMorning()};
+  try{await IDB.put("recus",Object.assign({},item,{mine:1}))}catch(e){}$("#muUrl").value="";$("#muMsg").value="";$("#muSt").textContent=sentMsg(how,"Morceau");burst(b,10);S.mu=S.mu||{};S.mu[today()]=1;addPts(ME,2,"partage","mu-"+item.id,"Morceau envoyé");save();renderRecus();renderMorning()};
 
 /* ===== REÇUS ===== */
 NET.on("photo",async m=>{if(typeof m.img!=="string"||!/^data:image\/jpeg;base64,/.test(m.img)||m.img.length>4e6||typeof m.id!=="string")return;
@@ -2548,7 +2594,7 @@ $$("#shTabs button").forEach(b=>b.onclick=()=>{$$("#shTabs button").forEach(x=>x
 const DFQ=JSON.parse($("#defisData").textContent);S.defi=S.defi||{};
 function defiOf(k){const lv0=S.week.d[dowOf(k)].d,lv=lv0===4&&!S.adult?3:lv0;if(!lv)return null;const list=DFQ[lv],ord=shuf(list.map((_,i)=>i),rng(hstr("defi"+lv)));return {lv,t:list[ord[((dayNo(k)%list.length)+list.length)%list.length]]}}
 NET.on("defi",m=>{if(typeof m.d!=="string"||(m.p!=="s"&&m.p!=="a"))return;const x=S.defi[m.d]=S.defi[m.d]||{};if(!x[m.p]){x[m.p]=+m.t||Date.now();save();renderMorning();if(m.p!==ME)notify("Défi relevé",`${PL[m.p].n} a relevé le défi du jour`)}});
-function defiDone(p){const k=today(),x=S.defi[k]=S.defi[k]||{};if(x[p])return;x[p]=Date.now();save();relay("defi",{d:k,p,t:x[p]});renderMorning()}
+function defiDone(p){const k=today(),x=S.defi[k]=S.defi[k]||{};if(x[p])return;x[p]=Date.now();save();addPts(p,5,"defi",`df-${k}-${p}`,"Défi du jour relevé");relay("defi",{d:k,p,t:x[p]});renderMorning()}
 
 /* ===== LE MATIN À DEUX (accueil) ===== */
 async function renderMorning(){const box=$("#morn");if(!box)return;const k=today(),now=new Date(),h=now.getHours(),w=S.week.d[now.getDay()],before=h<OPEN_H;
@@ -2573,7 +2619,7 @@ async function renderMorning(){const box=$("#morn");if(!box)return;const k=today
   box.querySelectorAll('[data-sh]').forEach(a=>a.addEventListener("click",()=>setTimeout(()=>{const t=$(`#shTabs [data-sh="${a.dataset.sh}"]`);if(t)t.click()},30)))}
 
 /* ===== SYNCHRO À LA CONNEXION ===== */
-function onLinkUp(){if(S.qz.plan)NET.send("qplan",{plan:S.qz.plan});NET.send("week",{week:S.week});
+function onLinkUp(){{const e=Object.entries(S.pts||{}).filter(([,x])=>x.ts>Date.now()-90*864e5).slice(-800).map(([id,x])=>Object.assign({id},x));if(e.length)NET.send("pts",{e})}if(S.qz.plan)NET.send("qplan",{plan:S.qz.plan});NET.send("week",{week:S.week});
   const lim=addD(today(),-14);Object.keys(S.qz.days).filter(k=>k>=lim).forEach(k=>{const d=S.qz.days[k];whoList().forEach(p=>{if(d[p])NET.send("qans",{d:k,p,ans:d[p],ix:d["x"+p]||d.ix,t:d["t"+p]})})});
   const ex=Object.fromEntries(Object.entries(S.qz.extra).slice(-120));if(Object.keys(ex).length)NET.send("qextra",{x:ex});
   Object.keys(S.defi).filter(k=>k>=lim).forEach(k=>whoList().forEach(p=>{if(S.defi[k][p])NET.send("defi",{d:k,p,t:S.defi[k][p]})}))}
@@ -2593,6 +2639,53 @@ const inviteURL=()=>`${location.origin}${location.pathname}#relier-${NET.code}${
 /* ===== DÉMARRAGE ===== */
 boxInit().then(()=>{boxPull();pushSync()});
 renderWeek();renderQuiz();renderMorning();renderRecus();setTimeout(qzEnsure,1500);
+/* ===== POINTS DU COUPLE ===== */
+S.pts=S.pts||{};
+const PK={jeux:["Jeux","1 point par défi relevé ou bonne réponse"],quiz:["Quiz du jour","2 points par bonne réponse, +2 pour un sans-faute"],defi:["Défi du jour","5 points par défi relevé"],partage:["Souvenirs et musique","3 points par photo, 2 par morceau envoyé"],rituel:["Rituel du jour","3 points quand le rituel est complet"],parcours:["Parcours","5 points chacun par étape terminée"],journal:["Journal","3 points chacun par moment noté"],soiree:["Mode Soirée","10 points chacun par soirée menée au bout"]};
+let ptsPer="w",_ptsQ=[],_ptsT=null;
+function addPts(p,n,k,id,l,silent){if((p!=="s"&&p!=="a")||!n||S.pts[id])return false;S.pts[id]={p,n,k,l:l||(PK[k]?PK[k][0]:""),ts:Date.now()};
+  const ks=Object.keys(S.pts);if(ks.length>6000){ks.sort((a,b)=>S.pts[a].ts-S.pts[b].ts).slice(0,ks.length-6000).forEach(x=>delete S.pts[x])}
+  save();_ptsQ.push(Object.assign({id},S.pts[id]));clearTimeout(_ptsT);_ptsT=setTimeout(()=>{const e=_ptsQ;_ptsQ=[];if(e.length)relay("pts",{e})},700);
+  if(!silent)ptsBump(p,n);renderPts();return true}
+NET.on("pts",m=>{let ch=false;(Array.isArray(m.e)?m.e:[]).slice(0,800).forEach(x=>{if(!x||typeof x.id!=="string"||S.pts[x.id]||(x.p!=="s"&&x.p!=="a"))return;const n=Math.max(-50,Math.min(50,x.n|0));if(!n)return;
+  S.pts[x.id.slice(0,80)]={p:x.p,n,k:PK[x.k]?x.k:"jeux",l:clean(x.l||"").slice(0,60),ts:+x.ts||Date.now()};ch=true});if(ch){save();renderPts()}});
+RELAY_T.add("pts");
+function ptsSum(from){const t={s:0,a:0,k:{}};for(const id in S.pts){const e=S.pts[id];if(from&&e.ts<from)continue;t[e.p]+=e.n;const c=t.k[e.k]=t.k[e.k]||{s:0,a:0};c[e.p]+=e.n}return t}
+function weekStart(off=0){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7)+off*7);return d.getTime()}
+function perFrom(){if(ptsPer==="w")return weekStart();if(ptsPer==="m"){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1).getTime()}return 0}
+function renderPts(){const t=ptsSum(0),w=ptsSum(weekStart()),pill=$("#scorePill");if(!pill)return;
+  const lead=w.s===w.a?null:(w.s>w.a?"s":"a");
+  pill.innerHTML=`<span class="sp s${lead==="s"?" lead":""}"><i>S</i><b>${w.s}</b></span><span class="spv">·</span><span class="sp a${lead==="a"?" lead":""}"><b>${w.a}</b><i>A</i></span>`;
+  pill.setAttribute("aria-label",`Points de la semaine : Stéphanie ${w.s}, Antoine ${w.a}. Ouvrir les scores.`);
+  if(!$("#ptsBg").hidden)renderPtsSheet()}
+function ptsBump(p,n){const pill=$("#scorePill");if(!pill)return;pill.classList.remove("bump2");void pill.offsetWidth;pill.classList.add("bump2");
+  if(RM())return;const r=pill.getBoundingClientRect(),s=document.createElement("span");s.className="plus ptsplus";s.textContent=`+${n} ${p==="s"?"Stéphanie":"Antoine"}`;s.style.left=(r.left+r.width/2)+"px";s.style.top=(r.bottom+4)+"px";document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}
+function relTime(ts){const m=Math.round((Date.now()-ts)/6e4);if(m<1)return "à l'instant";if(m<60)return `il y a ${m} min`;const h=Math.round(m/60);if(h<24)return `il y a ${h} h`;const d=Math.round(h/24);return d===1?"hier":`il y a ${d} jours`}
+function renderPtsSheet(){const from=perFrom(),t=ptsSum(from),tot=t.s+t.a,share=tot?t.s/tot:.5;
+  const lw=ptsSum(weekStart(-1));const lwT=Object.values(S.pts).filter(e=>e.ts>=weekStart(-1)&&e.ts<weekStart());let lws=0,lwa=0;lwT.forEach(e=>{if(e.p==="s")lws+=e.n;else lwa+=e.n});
+  const lead=t.s===t.a?(tot?"Égalité parfaite":"Aucun point pour l'instant"):`${t.s>t.a?"Stéphanie":"Antoine"} mène de ${Math.abs(t.s-t.a)} point${Math.abs(t.s-t.a)>1?"s":""}`;
+  $("#ptsBody").innerHTML=`<div class="chips" id="ptsPer" role="group" aria-label="Période">${[["w","Cette semaine"],["m","Ce mois-ci"],["all","Depuis le début"]].map(([k,l])=>`<button class="chip" data-p="${k}" aria-pressed="${k===ptsPer}">${l}</button>`).join("")}</div>
+   <div class="faceoff"><div class="fo s"><span class="avatar">${av("s")}</span><b>${t.s}</b></div><div class="fovs">VS</div><div class="fo a"><b>${t.a}</b><span class="avatar">${av("a")}</span></div></div>
+   <div class="fobar"><span style="width:${(share*100).toFixed(1)}%"></span></div>
+   <p class="folead">${lead}</p>
+   ${(lws||lwa)&&ptsPer==="w"?`<p class="small muted" style="text-align:center;margin:-4px 0 10px">La semaine dernière : ${lws===lwa?"égalité":`${lws>lwa?"Stéphanie":"Antoine"} l'a emporté (${Math.max(lws,lwa)} à ${Math.min(lws,lwa)})`}.</p>`:""}
+   <h3 style="margin-top:14px">Par activité</h3>
+   <div class="ptscat">${Object.keys(PK).map(k=>{const c=t.k[k]||{s:0,a:0};return `<div class="pcrow${c.s||c.a?"":" zero"}"><span>${PK[k][0]}</span><b class="s">${c.s}</b><b class="a">${c.a}</b></div>`}).join("")}</div>
+   <h3 style="margin-top:16px">Derniers points</h3>
+   <div class="ptslog">${Object.values(S.pts).sort((a,b)=>b.ts-a.ts).slice(0,12).map(e=>`<div><i class="dot ${e.p}"></i><span><b>${e.p==="s"?"Stéphanie":"Antoine"} +${e.n}</b> · ${esc(e.l||"")}</span><small>${relTime(e.ts)}</small></div>`).join("")||`<p class="small muted" style="margin:0">Jouez, répondez au quiz, relevez les défis : les points arrivent ici.</p>`}</div>
+   <details class="ptshow"><summary>Comment gagner des points</summary>${Object.values(PK).map(([l,d])=>`<p><b>${l}</b> : ${d}.</p>`).join("")}</details>`;
+  $$("#ptsPer .chip").forEach(b=>b.onclick=()=>{ptsPer=b.dataset.p;renderPtsSheet()})}
+$("#scorePill").onclick=()=>{renderPtsSheet();$("#ptsBg").hidden=false;requestAnimationFrame(()=>$("#ptsBg").classList.add("open"))};
+const closePts=()=>{$("#ptsBg").classList.remove("open");setTimeout(()=>$("#ptsBg").hidden=true,RM()?0:250)};
+$("#ptsClose").onclick=closePts;$("#ptsBg").onclick=e=>{if(e.target.id==="ptsBg")closePts()};
+/* quiz : points attribués à l'affichage des résultats, avec un identifiant commun aux deux téléphones */
+function ptsQuiz(){for(const k in S.qz.days){if(!resReady(k))continue;const d=S.qz.days[k];if(!d.ix)continue;["s","a"].forEach(p=>{const sc=dayScore(k,p);if(sc==null)return;const n=sc*2+(sc===d.ix.length?2:0);if(n)addPts(p,n,"quiz",`qz-${k}-${p}`,sc===d.ix.length?"Quiz du jour, sans-faute":"Quiz du jour",true)})}}
+/* rattrapage : défis, rituels et parcours déjà faits avant l'arrivée des points */
+(function(){if(S.ptsInit)return;S.ptsInit=1;
+  Object.keys(S.defi||{}).forEach(k=>["s","a"].forEach(p=>{if(S.defi[k]&&S.defi[k][p])addPts(p,5,"defi",`df-${k}-${p}`,"Défi du jour",true)}));
+  Object.keys(PR).forEach(pr=>Object.keys((S.pd||{})[pr]||{}).forEach(i=>{if(S.pd[pr][i])["s","a"].forEach(p=>addPts(p,5,"parcours",`pc-${pr}-${i}-${p}`,"Étape de parcours",true))}));
+  (S.journal||[]).forEach(e=>["s","a"].forEach(p=>addPts(p,3,"journal",`jr-${e.d}-${p}`,"Moment noté au journal",true)));save()})();
+ptsQuiz();renderPts();setInterval(()=>{if(document.visibilityState==="visible")ptsQuiz()},60000);
 /* ===== RANGÉES DÉFILANTES : indice visuel, molette et glisser à la souris ===== */
 $$(".chips").forEach(c=>{const upd=()=>{const more=c.scrollWidth>c.clientWidth+4;c.classList.toggle("more",more);c.classList.toggle("atstart",c.scrollLeft<4);c.classList.toggle("atend",c.scrollLeft+c.clientWidth>=c.scrollWidth-4)};
   c.addEventListener("scroll",upd,{passive:true});if(window.ResizeObserver)new ResizeObserver(upd).observe(c);new MutationObserver(upd).observe(c,{childList:true});upd();
