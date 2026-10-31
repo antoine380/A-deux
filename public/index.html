@@ -807,6 +807,9 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
 @media (prefers-reduced-motion:no-preference){.view{animation:in .3s ease}}
 @keyframes in{from{opacity:.4;transform:translateY(6px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.hlsafe{margin:10px 0 4px;padding:12px 14px;border-left:3px solid var(--accent);line-height:1.45}
+.cube.hot.c0 .cf{background:linear-gradient(150deg,#B0174C,#5E0A2A)}.cube.hot.c1 .cf{background:linear-gradient(150deg,#5A2A80,#22103A)}.cube.hot.c2 .cf{background:linear-gradient(150deg,#8A5A20,#3D2408)}
+.cf.sm{font-size:.62em!important;line-height:1.1}
 </style>
 
 </head>
@@ -1219,7 +1222,8 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
 
   <!-- ROUE -->
   <div class="gpanel" id="g-roue" hidden>
-    <div class="chips themec" role="group" aria-label="Thème"></div>
+    <div class="chips hlvl" data-for="roue" role="group" aria-label="Intensité"></div>
+    <div class="hlsafe card small" data-for="roue" hidden><b>Très hot : règles d'or.</b> Un mot d'arrêt (« rouge ») stoppe tout, tout de suite. Beaucoup de lubrifiant pour l'anal, on y va lentement. Jamais de l'anus vers le vagin sans laver ou changer de préservatif. Sextoys anaux avec base évasée uniquement. Rien ne serre le cou, et on détache dès qu'on le demande.</div>
     <div class="turn"><div class="avatar" id="rTurn"></div><span class="small muted">Tournez la roue</span></div>
     <div class="wheel-wrap">
       <div class="pointer" aria-hidden="true"></div>
@@ -1231,6 +1235,8 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
 
   <!-- DES -->
   <div class="gpanel" id="g-des" hidden>
+    <div class="chips hlvl" data-for="des" role="group" aria-label="Intensité"></div>
+    <div class="hlsafe card small" data-for="des" hidden><b>Très hot : règles d'or.</b> Un mot d'arrêt (« rouge ») stoppe tout, tout de suite. Beaucoup de lubrifiant pour l'anal, on y va lentement. Jamais de l'anus vers le vagin sans laver ou changer de préservatif. Sextoys anaux avec base évasée uniquement. Rien ne serre le cou, et on détache dès qu'on le demande.</div>
     <div class="turn"><div class="avatar" id="dTurn"></div><button class="chip" id="dSwap">Changer de joueur</button></div>
     <div class="dice3d" id="dice3d"></div>
     <div class="dlabels"><span>Action</span><span>Zone</span><span>Durée</span></div>
@@ -1885,48 +1891,85 @@ $$("#avPick button").forEach(b=>b.onclick=()=>avPick(b.dataset.k,glvl.av));
 function avNextTurn(done,remote){if(!remote)bc("av",{a:done?"done":"pass"});if(done){point(avp);burst($("#avCard"))}avp=other(avp);avReset()}
 $("#avDone").onclick=()=>avNextTurn(true);$("#avPass").onclick=()=>avNextTurn(false);
 
+/* ===== NIVEAUX ROUE / DÉS ===== */
+const HL={1:"Doux",2:"Hot",3:"Très hot"};const HGRAD={1:"linear-gradient(150deg,#6E4FA8,#C04A84)",2:"linear-gradient(150deg,#4E2E7A,#A8215F)",3:"linear-gradient(150deg,#1E0F2E,#8A0F3C)"};
+const hl={roue:1,des:1};let adultCb=null;
+function renderHL(){$$(".hlvl").forEach(c=>{const k=c.dataset.for;c.innerHTML=[1,2,3].map(l=>`<button class="chip${l===3&&!S.adult?" locked":""}" data-l="${l}" aria-pressed="${l===hl[k]}">${l===3&&!S.adult?"Très hot · 18+":HL[l]}</button>`).join("");
+  c.querySelectorAll(".chip").forEach(b=>b.onclick=()=>setHL(k,+b.dataset.l))});
+  $$(".hlsafe").forEach(e=>e.hidden=hl[e.dataset.for]!==3)}
+function setHL(k,l,remote){if(l===3&&!S.adult){if(remote){S.adult=true;save()}else{adultCb=()=>setHL(k,3);openAdult();return}}
+  hl[k]=[1,2,3].includes(l)?l:1;renderHL();if(k==="roue"){drawWheel();rIdle()}else{buildDice();$("#dRes").hidden=true}}
+
 /* ===== ROUE ===== */
-const WH=[["Baiser","{A} embrasse {B} pendant 30 secondes, à l'endroit choisi par {B}."],["Massage","{A} masse {B} pendant 1 minute, zone au choix de {B}."],["Vêtement","{A} enlève un vêtement, au choix de {B}."],["Vérité","VERITE"],["Chuchoter","{A} chuchote à {B} ce qui lui donne envie ce soir."],["Yeux fermés","{B} ferme les yeux. {A} l'embrasse à trois endroits surprises."],["Compliment","{A} fait trois compliments à {B}, en {lB} regardant dans les yeux."],["Joker","{A} invente librement un défi pour {B}."]];
-const WC=["#C04A84","#6E4FA8","#A8215F","#C9963F","#7B5BB0","#7E1846","#D9487F","#4E2E7A"];
-(function(){const cx=150,cy=150,r=140;let s="";WH.forEach((w,i)=>{const a0=(i*45-90)*Math.PI/180,a1=((i+1)*45-90)*Math.PI/180;
-  s+=`<path d="M${cx} ${cy} L${(cx+r*Math.cos(a0)).toFixed(1)} ${(cy+r*Math.sin(a0)).toFixed(1)} A${r} ${r} 0 0 1 ${(cx+r*Math.cos(a1)).toFixed(1)} ${(cy+r*Math.sin(a1)).toFixed(1)}Z" fill="${WC[i]}" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>`;
-  const am=i*45+22.5;s+=`<text x="${cx}" y="${cy-r+30}" transform="rotate(${am} ${cx} ${cy})" text-anchor="middle" fill="#fff" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="600" font-size="13">${w[0]}</text>`});
+const WHL={
+ 1:[["Baiser",["{A} embrasse {B} pendant 30 secondes, à l'endroit choisi par {B}."]],["Massage",["{A} masse {B} pendant 1 minute, zone au choix de {B}."]],["Vêtement",["{A} enlève un vêtement, au choix de {B}."]],["Vérité",["VERITE"]],["Chuchoter",["{A} chuchote à {B} ce qui lui donne envie ce soir."]],["Yeux fermés",["{B} ferme les yeux. {A} l'embrasse à trois endroits surprises."]],["Compliment",["{A} fait trois compliments à {B}, les yeux dans les yeux."]],["Joker",["{A} invente librement un défi pour {B}."]]],
+ 2:[["Strip",["{A} enlève deux vêtements en dansant pour {B}.","{A} déshabille entièrement {B}, lentement, sans jamais se presser."]],
+    ["Langue",["{A} lèche les tétons de {B} pendant 1 minute.","{A} fait glisser sa langue du cou jusqu'au nombril de {B}."]],
+    ["Bouche",["{A} embrasse et lèche le sexe de {B} pendant 1 minute.","{A} fait un cunni ou une fellation à {B} pendant 2 minutes."]],
+    ["Mains",["{A} caresse le sexe de {B} par-dessus ses sous-vêtements pendant 1 minute.","{A} caresse {B} partout, sauf le sexe, pendant 2 minutes."]],
+    ["Vérité hot",["VERITE"]],
+    ["Huile",["{A} masse les fesses et l'intérieur des cuisses de {B} à l'huile pendant 2 minutes.","{A} fait un massage à l'huile corps contre corps à {B}."]],
+    ["Bandeau",["{A} bande les yeux de {B} et le ou la caresse où il ou elle veut pendant 2 minutes.","Yeux bandés, {B} doit deviner quelle partie du corps de {A} il ou elle embrasse."]],
+    ["Fessée",["{A} donne cinq fessées à {B}, de plus en plus appuyées.","{B} choisit le nombre de fessées que {A} lui donne."]]],
+ 3:[["Anulingus",["{A} lèche l'anus de {B} pendant 2 minutes, lentement.","{B} se met à quatre pattes : {A} lui fait un anulingus jusqu'à ce que {B} dise stop."]],
+    ["Plug",["{A} insère doucement un plug bien lubrifié à {B}, qui le garde pendant les trois prochains tours.","{A} joue avec le plug de {B} : le faire bouger, le retirer, le remettre, pendant 2 minutes."]],
+    ["Gode",["{A} pénètre {B} analement avec un gode, très lentement et avec beaucoup de lubrifiant, pendant 3 minutes.","{A} utilise le gode sur {B}, au rythme que {B} dicte à voix haute."]],
+    ["Doigt",["{A} masse l'anus de {B} avec un doigt lubrifié, puis le fait entrer doucement.","{A} stimule {B} avec un doigt dans l'anus et sa bouche sur le sexe, en même temps."]],
+    ["Fessée",["{B} s'allonge sur les genoux de {A} : dix fessées, comptées à voix haute par {B}.","{A} fesse {B} de plus en plus fort, jusqu'au mot d'arrêt."]],
+    ["Attaché",["{A} attache les poignets de {B}, puis fait ce qu'il ou elle veut pendant 5 minutes.","{B} est attaché{eB} au lit, les yeux bandés : {A} décide de tout pendant 5 minutes."]],
+    ["Soumission",["{B} devient l'esclave de {A} pendant 5 minutes : obéissance totale.","{A} donne trois ordres à {B}, qui doit obéir sans discuter."]],
+    ["Sensations",["{A} fait couler de la cire de bougie de massage sur le corps de {B}.","{A} pose des pinces sur les tétons de {B} pendant 2 minutes.","{A} promène un glaçon puis sa langue sur le corps de {B}, jusqu'entre ses fesses."]]]};
+const WCL={1:["#C04A84","#6E4FA8","#A8215F","#C9963F","#7B5BB0","#7E1846","#D9487F","#4E2E7A"],2:["#A8215F","#6E2E7A","#C0305E","#4E2E7A","#8A1E52","#7B3B9E","#B8285A","#5A1E5E"],3:["#2B1A47","#8A0F3C","#3D1438","#A5163F","#1E0F2E","#6E0F35","#4A1A50","#931B44"]};
+function drawWheel(){const L=hl.roue,W=WHL[L],C=WCL[L],cx=150,cy=150,r=140;let s="";W.forEach((w,i)=>{const a0=(i*45-90)*Math.PI/180,a1=((i+1)*45-90)*Math.PI/180;
+  s+=`<path d="M${cx} ${cy} L${(cx+r*Math.cos(a0)).toFixed(1)} ${(cy+r*Math.sin(a0)).toFixed(1)} A${r} ${r} 0 0 1 ${(cx+r*Math.cos(a1)).toFixed(1)} ${(cy+r*Math.sin(a1)).toFixed(1)}Z" fill="${C[i]}" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>`;
+  const am=i*45+22.5;s+=`<text x="${cx}" y="${cy-r+30}" transform="rotate(${am} ${cx} ${cy})" text-anchor="middle" fill="#fff" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="600" font-size="${w[0].length>9?11.5:13}">${w[0]}</text>`});
   for(let i=0;i<16;i++){const a=(i*22.5-90)*Math.PI/180;s+=`<circle cx="${(cx+(r-6)*Math.cos(a)).toFixed(1)}" cy="${(cy+(r-6)*Math.sin(a)).toFixed(1)}" r="2.6" fill="#fff" opacity=".8"/>`}
-  s+=`<circle cx="${cx}" cy="${cy}" r="22" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="8" fill="var(--accent)"/>`;$("#wheel").innerHTML=s})();
+  s+=`<circle cx="${cx}" cy="${cy}" r="22" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="8" fill="var(--accent)"/>`;$("#wheel").innerHTML=s}
 let rp="s",rot=0,spinning=false;const rTurn=()=>$("#rTurn").innerHTML=av(rp);rTurn();
-const rIdle=()=>{$("#rRes").innerHTML=`<p class="muted" style="margin:0">Au tour de ${PL[rp].n}.</p>`};
-function rSpinGo(idx,ti,remote){if(spinning)return;spinning=true;$("#rSpin").disabled=true;const vl=AV.v[2];if(idx==null)idx=Math.random()*8|0;if(ti==null||typeof ti!=="string")ti=S.gtheme!=="mix"?qText(pickFrom("rq"+S.gtheme,poolQ(S.gtheme))):vl[Math.random()*vl.length|0];else ti=clean(ti);if(!remote)bc("r",{a:"spin",idx,ti,p:rp});const target=(360-(idx*45+22.5)+360)%360;
+const rIdle=()=>{$("#rRes").innerHTML=`<p class="muted" style="margin:0">Au tour de ${PL[rp].n} · niveau ${HL[hl.roue]}.</p>`};
+function rSpinGo(idx,ti,remote,l){if(spinning)return;if(l&&l!==hl.roue)setHL("roue",l,true);const L=hl.roue,W=WHL[L];spinning=true;$("#rSpin").disabled=true;
+  if(idx==null)idx=Math.random()*8|0;idx=Math.max(0,Math.min(7,idx|0));
+  if(ti==null||typeof ti!=="string"){const o=W[idx][1];ti=o[Math.random()*o.length|0];if(ti==="VERITE"){const vl=AV.v[L===1?2:3];ti="VERITE:"+vl[Math.random()*vl.length|0]}}else ti=clean(ti);
+  if(!remote)bc("r",{a:"spin",idx,ti,p:rp,l:L});const target=(360-(idx*45+22.5)+360)%360;
   rot=rot+(RM()?360:1800)+((target-(rot%360))+360)%360;$("#wheel").style.transform=`rotate(${rot}deg)`;
-  setTimeout(()=>{spinning=false;$("#rSpin").disabled=false;let t=WH[idx][1];if(t==="VERITE"){t="Vérité pour {A} : "+ti}
-    const r=$("#rRes");r.innerHTML=`<div class="eyebrow">${WH[idx][0]}</div><p style="margin:6px 0 10px;font-family:var(--display);font-size:1.15rem;font-weight:600">${T(t,rp)}</p><div class="row"><button class="btn soft" id="rPass">Passer</button><button class="btn" id="rOk" style="flex:1">Fait</button></div>`;
+  setTimeout(()=>{spinning=false;$("#rSpin").disabled=false;let t=ti.startsWith("VERITE:")?"Vérité pour {A} : "+ti.slice(7):ti;
+    const r=$("#rRes");r.innerHTML=`<div class="eyebrow">${W[idx][0]} · ${HL[L]}</div><p style="margin:6px 0 10px;font-family:var(--display);font-size:1.15rem;font-weight:600">${T(t,rp)}</p><div class="row"><button class="btn soft" id="rPass">Passer</button><button class="btn" id="rOk" style="flex:1">Fait</button></div>`;
     r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");
     $("#rOk").onclick=()=>rEnd(true);$("#rPass").onclick=()=>rEnd(false)},RM()?50:4300)}
 $("#rSpin").onclick=()=>rSpinGo();
 function rEnd(ok,remote){if(!remote)bc("r",{a:ok?"ok":"pass"});if(ok){point(rp);burst($("#wheel"))}rp=other(rp);rTurn();rIdle()}
 
 /* ===== DÉS 3D ===== */
-const DF=[["Embrasser","Masser","Effleurer","Souffler sur","Mordiller","Caresser"],["le cou","le dos","le ventre","les cuisses","les oreilles","la nuque"],["30 s","45 s","1 min","1 min 30","2 min","3 min"]];
-const DSEC=[30,45,60,90,120,180];
+const DFL={
+ 1:[["Embrasser","Masser","Effleurer","Souffler sur","Mordiller","Caresser"],["le cou","le dos","le ventre","les cuisses","les oreilles","la nuque"],["30 s","45 s","1 min","1 min 30","2 min","3 min"],[30,45,60,90,120,180]],
+ 2:[["Lécher","Embrasser","Mordiller","Masser à l'huile","Caresser","Souffler sur"],["les tétons","les fesses","l'intérieur des cuisses","le bas du ventre","le creux des reins","le sexe"],["1 min","1 min 30","2 min","2 min 30","3 min","4 min"],[60,90,120,150,180,240]],
+ 3:[["Lécher","Fesser","Doigter","Stimuler au gode","Mordiller","Masser au lubrifiant"],["l'anus","les fesses","le sexe","les tétons","le périnée","l'intérieur des cuisses"],["1 min","2 min","3 min","4 min","5 min","Jusqu'au stop"],[60,120,180,240,300,0]]};
+let DF=DFL[1],DSEC=DF[3];
 const FACE=[[0,0],[0,-90],[0,-180],[0,90],[-90,0],[90,0]];
 const drot=[{x:-20,y:25},{x:-20,y:25},{x:-20,y:25}],dres=[0,0,2];
-$("#dice3d").innerHTML=DF.map((faces,d)=>`<div class="dscene"><div class="cube c${d}" id="cube${d}">${faces.map((f,i)=>`<div class="cf f${i}">${f.replace(" ","<br>")}</div>`).join("")}</div></div>`).join("");
 const setCube=(d,anim)=>{const c=$("#cube"+d);c.style.transitionDuration=anim?(1.2+d*.35)+"s":"0s";c.style.transform=`rotateX(${drot[d].x}deg) rotateY(${drot[d].y}deg)`};
-[0,1,2].forEach(d=>setCube(d,false));
+function buildDice(){DF=DFL[hl.des];DSEC=DF[3];$("#dice3d").innerHTML=DF.slice(0,3).map((faces,d)=>`<div class="dscene"><div class="cube c${d}${hl.des===3?" hot":""}" id="cube${d}">${faces.map((f,i)=>`<div class="cf f${i}${f.length>12?" sm":""}">${f.replace(" ","<br>")}</div>`).join("")}</div></div>`).join("");[0,1,2].forEach(d=>setCube(d,false))}
+buildDice();
 let dp="s",rolled=false,rolling=false;
 const dTurn=()=>$("#dTurn").innerHTML=av(dp);dTurn();
 $("#dSwap").onclick=()=>{dp=other(dp);dTurn();bc("d",{a:"swap",p:dp});if(!$("#dRes").hidden)dShow()};
-function dShow(){const v=dres,act=DF[0][v[0]].toLowerCase(),sec=DSEC[v[2]],r=$("#dRes");r.hidden=false;r.style.background="linear-gradient(150deg,#4E2E7A,#A8215F)";
-  r.innerHTML=`<div class="top"><span>Au tour de ${PL[dp].n}</span><span>${DF[2][v[2]]}</span></div><div class="txt">${elide(`<em>${PL[dp].n}</em> va ${act} ${DF[1][v[1]]} de <em>${PL[other(dp)].n}</em>.`)}</div>${timerHTML(sec,"Go, on commence")}<div class="row" style="gap:8px;position:relative;z-index:1"><button class="btn ghostw" id="dPass">Passer</button><button class="btn whitebtn" id="dOk" style="flex:1">Fait</button></div>`;
-  bindTimer(r,sec);r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");
+function dPhrase(v){const a=DF[0][v[0]],z=DF[1][v[1]];if(a==="Fesser"&&!/fesses|cuisses/.test(z))return `<em>${PL[dp].n}</em> va fesser <em>${PL[other(dp)].n}</em>, puis lécher ${z}`;
+  if(a==="Stimuler au gode")return `<em>${PL[dp].n}</em> va stimuler ${z} de <em>${PL[other(dp)].n}</em> avec un gode`;
+  return `<em>${PL[dp].n}</em> va ${a.toLowerCase()} ${z} de <em>${PL[other(dp)].n}</em>`}
+function dShow(){const v=dres,sec=DSEC[v[2]],r=$("#dRes");r.hidden=false;r.style.background=HGRAD[hl.des];
+  r.innerHTML=`<div class="top"><span>Au tour de ${PL[dp].n}</span><span>${DF[2][v[2]]}</span></div><div class="txt">${elide(dPhrase(v)+".")}</div>${sec?timerHTML(sec,"Go, on commence"):`<div class="timer"><span class="small" style="opacity:.85">Jusqu'à ce que ${PL[other(dp)].n} dise stop.</span></div>`}<div class="row" style="gap:8px;position:relative;z-index:1"><button class="btn ghostw" id="dPass">Passer</button><button class="btn whitebtn" id="dOk" style="flex:1">Fait</button></div>`;
+  if(sec)bindTimer(r,sec);r.classList.remove("pop");void r.offsetWidth;r.classList.add("pop");
   $("#dOk").onclick=()=>dEnd(true);$("#dPass").onclick=()=>dEnd(false)}
 function dEnd(ok,remote){if(!remote)bc("d",{a:ok?"ok":"pass"});stopT();const r=$("#dRes");if(ok&&!r.hidden){point(dp);burst(r)}r.hidden=true}
-function dRollGo(res,p,remote){if(rolling)return;stopT();if(p){dp=p;dTurn()}else if(rolled){dp=other(dp);dTurn()}rolled=true;rolling=true;$("#dRes").hidden=true;$("#dRoll").disabled=true;
-  if(!res)res=[0,1,2].map(()=>Math.random()*6|0);if(!remote)bc("d",{a:"roll",res,p:dp});
+function dRollGo(res,p,remote,l){if(rolling)return;if(l&&l!==hl.des)setHL("des",l,true);stopT();if(p){dp=p;dTurn()}else if(rolled){dp=other(dp);dTurn()}rolled=true;rolling=true;$("#dRes").hidden=true;$("#dRoll").disabled=true;
+  if(!res)res=[0,1,2].map(()=>Math.random()*6|0);if(!remote)bc("d",{a:"roll",res,p:dp,l:hl.des});
   [0,1,2].forEach(d=>{const i=res[d]%6;dres[d]=i;const [fx,fy]=FACE[i];
     const nx=Math.ceil((drot[d].x+1)/360)*360+720+fx,ny=Math.ceil((drot[d].y+1)/360)*360+(d%2?1080:720)+fy;drot[d]={x:nx-20,y:ny+20};
     if(RM())drot[d]={x:fx-20,y:fy+20};setCube(d,!RM())});
   setTimeout(()=>{rolling=false;$("#dRoll").disabled=false;dShow()},RM()?60:1950)}
 $("#dRoll").onclick=()=>dRollGo();
+drawWheel();renderHL();
+
 
 /* ===== TU PRÉFÈRES ===== */
 const TP=[["Un massage d'une heure","Un dîner aux chandelles"],["Le matin","Le soir"],["Lumière tamisée","Pénombre totale"],["Lent et tendre","Passionné et intense"],["Être surpris","Tout prévoir ensemble"],["Un week-end à l'hôtel","Une soirée cocooning"],["Des messages coquins","Des mots doux à l'oreille"],["Mener la danse","Se laisser guider"],["Une douche à deux","Un bain à deux"],["Une longue séance de baisers","Un long massage"],["Avec de la musique","Dans le silence"],["Un nouvel endroit","Une nouvelle position"],["Être déshabillé lentement","Se déshabiller devant l'autre"],["Les yeux bandés","Les yeux dans les yeux"],["Une surprise improvisée","Une soirée préparée"],["Câlin avant","Câlin après"]];
@@ -2024,7 +2067,7 @@ function setTheme(k){if(k==="hot"&&!S.adult){openAdult();return}if(k!=="mix"&&!T
   if(curGame==="questions")qDraw();else if(curGame==="tp")tpStart();else if(curGame==="jamais")jmDraw();else if(curGame==="av")avReset();aiInfo()}
 function openAdult(){$("#adultBg").hidden=false;requestAnimationFrame(()=>$("#adultBg").classList.add("open"))}
 function closeAdult(){$("#adultBg").classList.remove("open");setTimeout(()=>$("#adultBg").hidden=true,RM()?0:250)}
-$("#adultYes").onclick=()=>{S.adult=true;save();closeAdult();setTheme("hot")};
+$("#adultYes").onclick=()=>{S.adult=true;save();closeAdult();if(adultCb){const f=adultCb;adultCb=null;f()}else setTheme("hot");if(typeof renderHL==="function")renderHL()};
 $("#adultNo").onclick=closeAdult;$("#adultBg").onclick=e=>{if(e.target.id==="adultBg")closeAdult()};
 $("#adultOff").onclick=()=>{S.adult=false;if(S.gtheme==="hot")S.gtheme="mix";save();renderThemeChips();if(curGame==="questions")qDraw()};
 
@@ -2305,8 +2348,8 @@ function goGame(g){if(location.hash!=="#jeu"){location.hash="jeu"}if(curGame!==g
 NET.on("open",m=>{const g=GN[m.g]?m.g:null;if(location.hash!=="#jeu"&&!g)return;goGame(g)});
 NET.on("c",m=>{if(m.a==="draw"){goGame("cartes");cDraw(m)}else if(m.a==="next")cNext(!!m.scored,false,true)});
 NET.on("av",m=>{if(m.a==="pick"&&AV[m.k]&&AV[m.k][m.l]&&typeof m.txt==="string"){goGame("av");if(m.p)avp=m.p;$("#avTurn").innerHTML=av(avp);avPick(m.k,m.l,null,true,m.txt,m.sec)}else if(m.a==="done"||m.a==="pass")avNextTurn(m.a==="done",true)});
-NET.on("r",m=>{if(m.a==="spin"){goGame("roue");if(m.p)rp=m.p;rTurn();rSpinGo(m.idx|0,String(m.ti||""),true)}else if(m.a==="ok"||m.a==="pass")rEnd(m.a==="ok",true)});
-NET.on("d",m=>{if(m.a==="roll"&&Array.isArray(m.res)){goGame("des");dRollGo(m.res.map(x=>x|0),m.p,true)}else if(m.a==="swap"){dp=m.p==="a"?"a":"s";dTurn();if(!$("#dRes").hidden)dShow()}else if(m.a==="ok"||m.a==="pass")dEnd(m.a==="ok",true)});
+NET.on("r",m=>{if(m.a==="spin"){goGame("roue");if(m.p)rp=m.p;rTurn();rSpinGo(m.idx|0,String(m.ti||""),true,+m.l||1)}else if(m.a==="ok"||m.a==="pass")rEnd(m.a==="ok",true)});
+NET.on("d",m=>{if(m.a==="roll"&&Array.isArray(m.res)){goGame("des");dRollGo(m.res.map(x=>x|0),m.p,true,+m.l||1)}else if(m.a==="swap"){dp=m.p==="a"?"a":"s";dTurn();if(!$("#dRes").hidden)dShow()}else if(m.a==="ok"||m.a==="pass")dEnd(m.a==="ok",true)});
 NET.on("tp",m=>{if(m.a==="q"&&Array.isArray(m.pair)){goGame("tp");tpStart(m.pair,true)}else if(m.a==="ans"&&(m.p==="s"||m.p==="a")){tpA[m.p]=m.o?1:0;if(curGame==="tp")tpCheck()}});
 NET.on("qz",m=>{if(m.a==="q"){goGame("quiz");qzStart(m.i|0,m.x,true)}else if(m.a==="ans"){qzAns=m.v|0;if(curGame==="quiz")qzDuo()}else if(m.a==="guess"){qzG=m.g|0;if(curGame==="quiz")qzDuo()}});
 NET.on("jm",m=>{if(m.a==="q"&&typeof m.txt==="string"){goGame("jamais");jmDraw(m.txt,true)}else if(m.a==="ans"&&(m.p==="s"||m.p==="a")){jmA[m.p]=m.v?1:0;const o=$("#jmOther");if(o)o.textContent="a répondu";if(jmA.s!==undefined&&jmA.a!==undefined)jmRes()}});
