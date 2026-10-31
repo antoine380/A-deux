@@ -88,14 +88,14 @@ p{margin:0 0 12px}
 .hero{margin-top:14px;border-radius:24px;padding:22px 20px;background:
   radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--accent-2) 40%,transparent),transparent 60%),
   radial-gradient(90% 90% at 0% 100%,color-mix(in srgb,var(--plum-2) 45%,transparent),transparent 60%),
-  var(--plum);color:#fff;position:relative;overflow:hidden}
+  #4E2E7A;color:#fff;position:relative;overflow:hidden}
 .hero .eyebrow{color:#FFD6E7}
 .hero h1{color:#fff;margin:8px 0 6px;font-size:1.75rem}
 .hero p{color:#F1E4F7;margin:0 0 14px}
 .hero .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden;margin:6px 0 8px}
 .hero .bar span{display:block;height:100%;background:linear-gradient(90deg,#FFB3D1,#fff);border-radius:99px;transition:width .5s}
 .hero .meta{display:flex;justify-content:space-between;font-size:.82rem;color:#F1E4F7;font-variant-numeric:tabular-nums}
-.hero .btn{background:#fff;color:var(--plum);margin-top:14px}
+.hero .btn{background:#fff;color:#4E2E7A;margin-top:14px}
 .qday{display:flex;flex-direction:column;gap:8px}
 .qday blockquote{margin:0;font-family:var(--display);font-size:1.22rem;font-weight:600;line-height:1.3;letter-spacing:-.01em}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -258,7 +258,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
 .gcard.flip{transform:rotateY(90deg)}
 .gcard .top{display:flex;justify-content:space-between;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.9}
 .gcard .txt{font-family:var(--display);font-size:1.5rem;font-weight:600;line-height:1.22;letter-spacing:-.01em;position:relative;z-index:1}
-.gcard .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 6px;border-radius:6px}
+.gcard .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 .18em;margin:0 -.04em;border-radius:6px}
 .timer{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
 .timer .ring{width:46px;height:46px}
 .timer .ring circle{fill:none;stroke-width:4}
@@ -291,7 +291,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
 .gtile b{font-family:var(--display);font-size:1.12rem;font-weight:600;line-height:1.15}
 .gtile small{font-size:.8rem;opacity:.85;line-height:1.3}
 .gtile:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-.wheel-wrap{position:relative;max-width:320px;margin:4px auto 0}
+.wheel-wrap{position:relative;max-width:320px;margin:4px auto 0;overflow:hidden;padding-top:6px}
 #wheel{display:block;width:100%;height:auto;transition:transform 4.2s cubic-bezier(.15,.85,.2,1);filter:drop-shadow(0 8px 20px rgba(60,20,50,.18))}
 .pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--fg);z-index:2}
 .tpo{display:flex;flex-direction:column;gap:8px;align-items:stretch}
@@ -389,7 +389,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
 .face.front{transform:rotateY(180deg);color:#fff;padding:24px 22px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;box-shadow:0 18px 40px rgba(60,20,50,.28)}
 .face.front .top{display:flex;justify-content:space-between;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.9}
 .face.front .txt{font-family:var(--display);font-size:1.42rem;font-weight:600;line-height:1.22;letter-spacing:-.01em}
-.face.front .txt em,.dres .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 6px;border-radius:6px}
+.face.front .txt em,.dres .txt em{font-style:normal;background:rgba(255,255,255,.18);padding:0 .18em;margin:0 -.04em;border-radius:6px}
 @media (prefers-reduced-motion:no-preference){
   .fcard.deal{animation:deal .6s cubic-bezier(.2,1.1,.3,1) both}
   .fcard:not(.open) .face.back{animation:float 3.5s ease-in-out infinite}
@@ -415,7 +415,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
 .f5{transform:rotateX(-90deg) translateZ(43px)}
 .dlabels{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:14px}
 .dres{min-height:auto;margin-top:16px}
-.btn.whitebtn{background:#fff;color:var(--plum)}
+.btn.whitebtn{background:#fff;color:#4E2E7A}
 .btn.ghostw{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6)}
 .btn:disabled{opacity:.5;cursor:default}
 
@@ -614,7 +614,7 @@ button,.tile,.gtile,.chip,.btn{touch-action:manipulation}
 .aimsg.wait{color:var(--muted)}
 /* ===== v10 : matin, quiz, partage, semaine ===== */
 .pill2{display:inline-flex;align-items:center;font-size:.8rem;font-weight:700;padding:6px 10px;border-radius:99px;background:rgba(255,255,255,.2);color:inherit}
-.badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:.7rem;font-weight:800;margin-left:4px;vertical-align:1px}
+.nbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:.7rem;font-weight:800;margin-left:4px;vertical-align:1px}
 .lg{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
 .lg.q{background:#2E7BB8}.lg.p{background:#C04A84}.lg.m{background:#2C9A7A}.lg.d{background:#C9963F}
 /* matin */
@@ -682,7 +682,7 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 .qzh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
 .qzh span:first-child{font-weight:700}
 /* partage */
-.phstrip{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.phstrip{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;overflow-x:auto;padding:6px 6px 12px;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .phth{all:unset;cursor:pointer;position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/4;background:var(--raise);scroll-snap-align:start;box-shadow:0 6px 16px rgba(40,10,40,.12);transition:transform .2s}
 .phth img{width:100%;height:100%;object-fit:cover;display:block}
 .phth span{position:absolute;left:0;right:0;bottom:0;padding:22px 8px 8px;font-size:.72rem;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65))}
@@ -707,7 +707,7 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 .wkrow:last-child{border-bottom:0}
 .wkrow b{font-family:var(--display);font-size:1rem;display:flex;flex-direction:column;line-height:1.1}
 .wkrow b small{font-family:var(--body);font-size:.66rem;font-weight:700;color:var(--accent)}
-.wkrow.today{background:var(--accent-soft);border-radius:12px;padding-inline:6px;border-bottom-color:transparent}
+.wkrow.today{background:var(--accent-soft);border-radius:12px;margin-inline:-6px;padding-inline:6px;border-bottom-color:transparent}
 .wkhead{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center}
 .wkc{all:unset;cursor:pointer;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--raise);border:1.5px solid var(--line);color:var(--muted);font-size:.74rem;font-weight:700;transition:background .2s,transform .12s}
 .wkc svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -775,7 +775,7 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 @keyframes wdots{0%,100%{opacity:.2;transform:scaleX(.4)}50%{opacity:1;transform:scaleX(1)}}
 .wrbtns{display:flex;flex-direction:column;gap:10px;width:min(100%,320px);margin:0 auto}
 .wrbtns .btn,.wrgo{width:100%;box-sizing:border-box}
-.wroom .btn:not(.ghostw){background:#fff;color:var(--plum)}
+.wroom .btn:not(.ghostw){background:#fff;color:#4E2E7A}
 .wrgo{max-width:320px}
 .wrcodebox{display:inline-flex;flex-direction:column;gap:2px;background:rgba(255,255,255,.12);border-radius:16px;padding:10px 22px;margin-bottom:16px}
 .wrcodebox span{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
@@ -784,7 +784,7 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 .wrcode input{flex:1;min-width:0;text-transform:uppercase;font-size:1.2rem;letter-spacing:.12em;text-align:center;background:rgba(255,255,255,.95);color:#2B1A47}
 .wrerr{color:#FFC2C2;margin:8px auto}
 .wrnote{color:#D9F5E6;margin:12px auto 0}
-.wrorbs.mini{height:auto;gap:0;margin:0;flex:none}
+.wrorbs.mini{height:auto;gap:0;margin:0;flex:none}.wrorbs.mini::after{display:none!important}
 .wrorbs.mini .orb{width:34px;height:34px;font-size:.85rem;box-shadow:none}
 .wrorbs.mini .orb.a{margin-left:-10px}
 .duocard{border-radius:20px;padding:14px;margin:6px 0 12px;background:linear-gradient(130deg,#2B1A47,#4E2E7A 60%,#7E1846);color:#fff;display:flex;flex-direction:column;gap:12px}
@@ -792,7 +792,7 @@ input[type=date]{font:inherit;font-size:16px;color:var(--fg);background:var(--ra
 .duocard b{display:block;font-family:var(--display);font-size:1.08rem}
 .duocard span{font-size:.84rem;opacity:.85}
 .duobtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.duobtns .btn{background:#fff;color:var(--plum);padding-inline:8px}
+.duobtns .btn{background:#fff;color:#4E2E7A;padding-inline:8px}
 .duobtns .btn.soft{background:rgba(255,255,255,.16);color:#fff}
 .duocard.on{flex-direction:row;align-items:center;background:var(--ok-soft);color:var(--ok)}
 .duodot{width:12px;height:12px;border-radius:50%;background:var(--ok);flex:none}
@@ -851,7 +851,7 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
   <h2>Explorer</h2>
   <div class="tiles">
     <button class="tile" data-go="anatomie"><svg class="ic" viewBox="0 0 34 34"><circle cx="17" cy="9" r="5" fill="var(--accent)"/><path d="M14 13 Q8 22 5 30 M20 13 Q26 22 29 30" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/></svg><strong>Anatomie</strong><small>Planche interactive du clitoris</small></button>
-    <button class="tile" data-go="jeu"><svg class="ic" viewBox="0 0 34 34"><rect x="5" y="5" width="24" height="24" rx="7" fill="var(--gold)"/><circle cx="12" cy="12" r="2.4" fill="#fff"/><circle cx="17" cy="17" r="2.4" fill="#fff"/><circle cx="22" cy="22" r="2.4" fill="#fff"/></svg><strong>Le jeu</strong><small>Cartes et dés, chacun son tour</small></button>
+    <button class="tile" data-go="jeu"><svg class="ic" viewBox="0 0 34 34"><rect x="5" y="5" width="24" height="24" rx="7" fill="var(--gold)"/><circle cx="12" cy="12" r="2.4" fill="#fff"/><circle cx="17" cy="17" r="2.4" fill="#fff"/><circle cx="22" cy="22" r="2.4" fill="#fff"/></svg><strong>Le jeu</strong><small>Cartes, dés, roue, quiz et questions à thème</small></button>
     <button class="tile" data-go="positions"><svg class="ic" viewBox="0 0 34 34"><circle cx="11" cy="17" r="7" fill="var(--accent)"/><circle cx="23" cy="17" r="7" fill="var(--plum-2)" opacity=".85"/></svg><strong>Positions</strong><small>Guide filtrable et favoris</small></button>
     <button class="tile" data-go="desirs"><svg class="ic" viewBox="0 0 34 34"><rect x="6" y="5" width="16" height="22" rx="4" fill="var(--plum-2)" transform="rotate(-10 14 16)"/><rect x="12" y="7" width="16" height="22" rx="4" fill="var(--accent)"/></svg><strong>Nos envies</strong><small>Seules les envies communes apparaissent</small></button>
   </div>
@@ -907,7 +907,7 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
     <button class="tile" data-go="excitation"><strong>Le cycle du désir</strong><small>Comprendre comment l'excitation monte</small></button>
     <button class="tile" data-go="consentement"><strong>Consentement</strong><small>Le socle de tout le reste</small></button>
     <button class="tile" data-go="positions"><strong>Positions</strong><small>Guide filtrable et favoris</small></button>
-    <button class="tile" data-go="jeu"><strong>Le jeu</strong><small>Cartes et dés pour Stéphanie et Antoine</small></button>
+    <button class="tile" data-go="jeu"><strong>Le jeu</strong><small>Cartes, dés, roue et questions pour Stéphanie et Antoine</small></button>
   </div>
 </section>
 
@@ -1328,7 +1328,7 @@ nav.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;bor
   <div class="who" role="group" aria-label="Rubrique" id="shTabs">
     <button data-sh="photos" aria-pressed="true">Photos</button>
     <button data-sh="music" aria-pressed="false">Musique</button>
-    <button data-sh="recus" aria-pressed="false">Reçus <span id="shBadge" class="badge" hidden></span></button>
+    <button data-sh="recus" aria-pressed="false">Reçus <span id="shBadge" class="nbadge" hidden></span></button>
   </div>
   <div id="sh-photos" style="margin-top:14px">
     <div class="rit-h" style="margin-top:6px"><h2 style="margin:0">Les souvenirs du jour</h2><span class="small muted" id="phCount"></span></div>
@@ -1771,7 +1771,7 @@ const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 const dur=s=>s<60?s+" s":(s%60?Math.floor(s/60)+" min 30":(s/60)+" min");
 const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* tokens : {A} joueur, {B} partenaire, {e}/{eB} accord féminin de A/B, {lB} le/la pour B */
-const elide=h=>h.replace(/\bde <em>Antoine/g,"d'<em>Antoine").replace(/\bque <em>Antoine/g,"qu'<em>Antoine").replace(/qu'<em>Stéphanie/g,"que <em>Stéphanie");
+const elide=h=>h.replace(/\bde <em>Antoine/g,"<em>d'Antoine").replace(/\bque <em>Antoine/g,"<em>qu'Antoine").replace(/qu'<em>Stéphanie/g,"que <em>Stéphanie").replace(/<em>qu'Stéphanie/g,"que <em>Stéphanie").replace(/<em>d'Stéphanie/g,"de <em>Stéphanie");
 function T(t,p){return elide(T0(t,p))}
 function T0(t,p){const q=other(p);return t.replaceAll("{A}",`<em>${PL[p].n}</em>`).replaceAll("{B}",`<em>${PL[q].n}</em>`).replaceAll("{eB}",PL[q].f?"e":"").replaceAll("{e}",PL[p].f?"e":"").replaceAll("{lB}",PL[q].f?"la":"le").replace(/\{([^{}|]+)\|([^{}|]+)\}/g,(m,a,b)=>PL[p].f?b:a)}
 const GLV={0:"Aléatoire",1:"Doux",2:"Complice",3:"Audacieux"};
